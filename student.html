@@ -5,37 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal | Academy Madavoor</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        
         :root { --primary-blue: #003b8e; --light-blue: #0056d6; --bg-color: #f4f7f6; --white: #ffffff; --text-dark: #1a2a3a; --danger: #ef4444; --success: #10b981; --warning: #f59e0b;}
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; }
-
         #app-container { width: 100%; max-width: 450px; min-height: 100vh; background: var(--bg-color); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding-bottom: 80px; }
         header { background: var(--primary-blue); color: var(--white); padding: 20px; text-align: center; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 10px rgba(0,59,142,0.2); position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;}
         #logout-btn { display: none; background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
-
         .screen { padding: 20px; display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease; }
 
-        /* Login Screen */
+        /* Login */
         .login-box { background: var(--white); padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-top: 50px; text-align: center; }
         .login-box i { font-size: 3rem; color: var(--primary-blue); margin-bottom: 15px; }
         .form-control { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center;}
         .btn { width: 100%; padding: 15px; background: var(--primary-blue); color: var(--white); border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s;}
-        
         #sibling-selector { display: none; margin-top: 15px; }
         .sibling-btn { background: #e2e8f0; color: var(--text-dark); margin-bottom: 10px; }
 
         /* Dashboard Overview */
         .greeting { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
         .sub-greeting { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
-        
         .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .summary-card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--primary-blue);}
         .summary-card i { font-size: 1.8rem; color: var(--light-blue); margin-bottom: 10px; }
@@ -45,21 +39,34 @@
         /* Cards & Lists */
         .card { background: var(--white); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 4px solid var(--primary-blue); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
-        
         .history-item { display: flex; justify-content: space-between; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; background: white; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
-        
         .empty-state { text-align: center; padding: 40px 20px; color: #888; }
         .empty-state i { font-size: 3rem; color: #cbd5e1; margin-bottom: 15px; }
-
-        /* Progress Bar for Fees */
         .progress-bar-bg { width: 100%; background: #e2e8f0; height: 10px; border-radius: 10px; margin: 15px 0 5px 0; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: var(--success); border-radius: 10px; transition: width 0.5s ease; }
 
-        /* Bottom Nav */
+        /* NEW: Netflix-Style Video UI */
+        .folder-title { font-size: 1.1rem; color: #555; margin-bottom: 12px; border-bottom: 2px solid #ddd; padding-bottom: 5px; font-weight: 700; margin-top: 20px;}
+        .video-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; cursor: pointer; transition: 0.2s;}
+        .video-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1);}
+        .video-thumb { width: 100%; height: 160px; background-size: cover; background-position: center; position: relative; }
+        .video-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; }
+        .video-overlay i { font-size: 3rem; color: rgba(255,255,255,0.9); text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .video-info { padding: 15px; }
+        .video-info h4 { font-size: 1rem; color: var(--text-dark); margin-bottom: 5px; }
+
+        /* NEW: Cinematic Player Modal */
+        .player-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 999; display: none; flex-direction: column; justify-content: center; }
+        .player-header { position: absolute; top: 0; left: 0; width: 100%; padding: 15px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); color: white; z-index: 1000;}
+        .player-close { font-size: 1.5rem; cursor: pointer; padding: 5px 15px; }
+        .video-iframe-container { position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 Aspect Ratio */ }
+        .video-iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        /* Bottom Nav - Updated to 5 Tabs (20% width) */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: var(--white); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: none; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 20; }
-        .nav-item { text-align: center; color: #888; cursor: pointer; transition: 0.3s; width: 25%;}
-        .nav-item i { font-size: 1.3rem; display: block; margin-bottom: 5px; }
-        .nav-item span { font-size: 0.7rem; font-weight: 600; }
+        .nav-item { text-align: center; color: #888; cursor: pointer; transition: 0.3s; width: 20%;}
+        .nav-item i { font-size: 1.2rem; display: block; margin-bottom: 5px; }
+        .nav-item span { font-size: 0.65rem; font-weight: 600; }
         .nav-item.active { color: var(--primary-blue); transform: translateY(-3px);}
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -78,15 +85,10 @@
                 <i class="fas fa-user-graduate"></i>
                 <h2 style="color: var(--primary-blue);">Welcome Back</h2>
                 <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Enter your registered WhatsApp number to view your profile.</p>
-                
                 <input type="tel" id="phone-input" class="form-control" placeholder="10-digit Phone Number">
                 <button class="btn" id="login-action-btn" onclick="checkPhone()">Access Portal</button>
                 <p id="error-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; font-weight: 600;"></p>
-
-                <div id="sibling-selector">
-                    <p style="font-size: 0.9rem; color: var(--primary-blue); font-weight: bold; margin-bottom: 10px;">Select Student:</p>
-                    <div id="sibling-buttons"></div>
-                </div>
+                <div id="sibling-selector"><p style="font-size: 0.9rem; color: var(--primary-blue); font-weight: bold; margin-bottom: 10px;">Select Student:</p><div id="sibling-buttons"></div></div>
             </div>
         </div>
 
@@ -95,84 +97,62 @@
             <div class="sub-greeting" id="student-batch">Class - Batch</div>
 
             <div class="summary-grid">
-                <div class="summary-card" style="border-bottom-color: var(--warning);">
-                    <i class="fas fa-calendar-check" style="color: var(--warning);"></i>
-                    <h3 id="dash-att">--%</h3>
-                    <p>Attendance</p>
-                </div>
-                <div class="summary-card" style="border-bottom-color: var(--danger);">
-                    <i class="fas fa-rupee-sign" style="color: var(--danger);"></i>
-                    <h3 id="dash-due">₹--</h3>
-                    <p>Due Fees</p>
-                </div>
+                <div class="summary-card" style="border-bottom-color: var(--warning);"><i class="fas fa-calendar-check" style="color: var(--warning);"></i><h3 id="dash-att">--%</h3><p>Attendance</p></div>
+                <div class="summary-card" style="border-bottom-color: var(--danger);"><i class="fas fa-rupee-sign" style="color: var(--danger);"></i><h3 id="dash-due">₹--</h3><p>Due Fees</p></div>
             </div>
 
             <div class="card" style="background: var(--primary-blue); color: white; border: none; text-align: center;">
-                <h3 style="color: white; font-size: 1.1rem; margin-bottom: 10px;">Upcoming Exams</h3>
-                <p style="font-size: 0.9rem; color: #d1d5db;">Check the Exams tab for the latest schedule and results.</p>
-                <button onclick="switchTab('exams')" style="margin-top: 10px; background: white; color: var(--primary-blue); border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;">View Exams</button>
+                <h3 style="color: white; font-size: 1.1rem; margin-bottom: 10px;">Digital Library</h3>
+                <p style="font-size: 0.9rem; color: #d1d5db;">Watch recorded lectures and class materials anytime.</p>
+                <button onclick="switchTab('videos')" style="margin-top: 10px; background: white; color: var(--primary-blue); border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;">Go to Videos</button>
             </div>
         </div>
 
         <div id="attendance-screen" class="screen">
             <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-calendar-alt"></i> Attendance History</h2>
-            <div id="attendance-list">
-                <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading attendance...</p></div>
-            </div>
+            <div id="attendance-list"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading attendance...</p></div></div>
         </div>
 
         <div id="fees-screen" class="screen">
             <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-file-invoice-dollar"></i> Fee Details</h2>
             <div class="card" style="padding: 25px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                    <span style="color: #666; font-weight: 600;">Total Course Fee:</span>
-                    <span id="fee-total" style="font-weight: 700; font-size: 1.1rem;">₹0</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                    <span style="color: #666; font-weight: 600;">Amount Paid:</span>
-                    <span id="fee-paid" style="font-weight: 700; color: var(--success); font-size: 1.1rem;">₹0</span>
-                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;"><span style="color: #666; font-weight: 600;">Total Course Fee:</span><span id="fee-total" style="font-weight: 700; font-size: 1.1rem;">₹0</span></div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;"><span style="color: #666; font-weight: 600;">Amount Paid:</span><span id="fee-paid" style="font-weight: 700; color: var(--success); font-size: 1.1rem;">₹0</span></div>
                 <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--danger); font-weight: 700; font-size: 1.2rem;">Pending Due:</span>
-                    <span id="fee-pending" style="font-weight: 700; color: var(--danger); font-size: 1.2rem;">₹0</span>
-                </div>
-                
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" id="fee-progress"></div>
-                </div>
+                <div style="display: flex; justify-content: space-between;"><span style="color: var(--danger); font-weight: 700; font-size: 1.2rem;">Pending Due:</span><span id="fee-pending" style="font-weight: 700; color: var(--danger); font-size: 1.2rem;">₹0</span></div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="fee-progress"></div></div>
                 <p id="fee-percent-text" style="text-align: right; font-size: 0.8rem; color: #888; font-weight: 600;">0% Paid</p>
-                
-                <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 10px; border-radius: 8px; margin-top: 20px; font-size: 0.85rem; color: #991b1b; text-align: center;">
-                    <i class="fas fa-info-circle"></i> Please contact the academy office directly to clear pending dues.
-                </div>
             </div>
         </div>
 
         <div id="exams-screen" class="screen">
             <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-file-alt"></i> Exams & Results</h2>
-            <div id="exams-list">
-                <div class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
-                    <h3 style="color: var(--text-dark); margin-bottom: 5px;">No Exams Found</h3>
-                    <p style="font-size: 0.9rem;">There are currently no exams scheduled for your batch. Check back later!</p>
-                </div>
+            <div id="exams-list"><div class="empty-state"><i class="fas fa-clipboard-list"></i><h3 style="color: var(--text-dark); margin-bottom: 5px;">No Exams Found</h3><p style="font-size: 0.9rem;">There are currently no exams scheduled for your batch.</p></div></div>
+        </div>
+
+        <div id="videos-screen" class="screen">
+            <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 5px;"><i class="fas fa-play-circle"></i> Digital Library</h2>
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Select a subject folder below to start watching.</p>
+            <div id="videos-list-container">
+                <div class="empty-state"><i class="fas fa-video-slash"></i><p>No videos available for your batch yet.</p></div>
             </div>
         </div>
 
+        <div id="video-player-modal" class="player-overlay">
+            <div class="player-header">
+                <h3 id="player-title" style="font-size: 1rem; font-weight: 600; margin: 0;">Playing Video...</h3>
+                <i class="fas fa-times player-close" onclick="closePlayer()"></i>
+            </div>
+            <div class="video-iframe-container" id="iframe-box">
+                </div>
+        </div>
+
         <nav class="bottom-nav" id="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('dashboard')">
-                <i class="fas fa-home"></i><span>Home</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('attendance')">
-                <i class="fas fa-calendar-check"></i><span>Attendance</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('fees')">
-                <i class="fas fa-rupee-sign"></i><span>Fees</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('exams')">
-                <i class="fas fa-pen-alt"></i><span>Exams</span>
-            </div>
+            <div class="nav-item active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i><span>Home</span></div>
+            <div class="nav-item" onclick="switchTab('attendance')"><i class="fas fa-calendar-check"></i><span>Attendance</span></div>
+            <div class="nav-item" onclick="switchTab('fees')"><i class="fas fa-rupee-sign"></i><span>Fees</span></div>
+            <div class="nav-item" onclick="switchTab('exams')"><i class="fas fa-pen-alt"></i><span>Exams</span></div>
+            <div class="nav-item" onclick="switchTab('videos')"><i class="fas fa-play-circle"></i><span>Videos</span></div>
         </nav>
     </div>
 
@@ -180,202 +160,137 @@
         // =========================================================
         // FIREBASE CONFIGURATION
         // =========================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyDNo7xIyzmcAhOjjnjB5JF2eTiIXY5kfJg",
-            authDomain: "academy-madavoor-portal.firebaseapp.com",
-            projectId: "academy-madavoor-portal",
-            storageBucket: "academy-madavoor-portal.firebasestorage.app",
-            messagingSenderId: "883093460593",
-            appId: "1:883093460593:web:489d90f93fa78eb3e1add0"
-        };
-        
+        const firebaseConfig = { apiKey: "AIzaSyDNo7xIyzmcAhOjjnjB5JF2eTiIXY5kfJg", authDomain: "academy-madavoor-portal.firebaseapp.com", projectId: "academy-madavoor-portal", storageBucket: "academy-madavoor-portal.firebasestorage.app", messagingSenderId: "883093460593", appId: "1:883093460593:web:489d90f93fa78eb3e1add0" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Global Variable for the logged-in student
         let currentStudent = null;
 
-        // Check if already logged in (Local Storage)
         window.onload = () => {
             const savedStudent = localStorage.getItem('academyStudentData');
-            if (savedStudent) {
-                currentStudent = JSON.parse(savedStudent);
-                loadStudentPortal();
-            }
+            if (savedStudent) { currentStudent = JSON.parse(savedStudent); loadStudentPortal(); }
         };
 
-        // =========================================================
-        // LOGIN LOGIC (Phone Number Verification)
-        // =========================================================
         function checkPhone() {
-            const phone = document.getElementById('phone-input').value.trim();
-            const errorMsg = document.getElementById('error-msg');
-            const btn = document.getElementById('login-action-btn');
-            
-            if (phone.length < 10) {
-                errorMsg.innerText = "Please enter a valid phone number.";
-                return;
-            }
-
-            btn.innerText = "Searching...";
-            errorMsg.innerText = "";
+            const phone = document.getElementById('phone-input').value.trim(); const errorMsg = document.getElementById('error-msg'); const btn = document.getElementById('login-action-btn');
+            if (phone.length < 10) return errorMsg.innerText = "Please enter a valid phone number.";
+            btn.innerText = "Searching..."; errorMsg.innerText = "";
 
             db.collection("Students").where("Phone", "==", phone).get().then((snapshot) => {
-                if (snapshot.empty) {
-                    errorMsg.innerText = "Phone number not found in our records.";
-                    btn.innerText = "Access Portal";
-                    return;
-                }
-
-                let matches = [];
-                snapshot.forEach(doc => matches.push({ id: doc.id, ...doc.data() }));
-
-                if (matches.length === 1) {
-                    // One student found -> Log them right in
-                    loginAs(matches[0]);
-                } else {
-                    // Multiple siblings share the same phone number
-                    btn.style.display = 'none';
-                    document.getElementById('sibling-selector').style.display = 'block';
-                    
-                    let siblingHtml = '';
-                    matches.forEach(student => {
-                        siblingHtml += `<button class="btn sibling-btn" onclick='loginAs(${JSON.stringify(student)})'>${student.Name} (${student.Class})</button>`;
-                    });
+                if (snapshot.empty) { errorMsg.innerText = "Phone number not found."; btn.innerText = "Access Portal"; return; }
+                let matches = []; snapshot.forEach(doc => matches.push({ id: doc.id, ...doc.data() }));
+                if (matches.length === 1) { loginAs(matches[0]); } 
+                else {
+                    btn.style.display = 'none'; document.getElementById('sibling-selector').style.display = 'block';
+                    let siblingHtml = ''; matches.forEach(student => { siblingHtml += `<button class="btn sibling-btn" onclick='loginAs(${JSON.stringify(student)})'>${student.Name} (${student.Class})</button>`; });
                     document.getElementById('sibling-buttons').innerHTML = siblingHtml;
                 }
-            }).catch(error => {
-                errorMsg.innerText = "Connection error. Please check internet.";
-                btn.innerText = "Access Portal";
-            });
+            }).catch(error => { errorMsg.innerText = "Connection error."; btn.innerText = "Access Portal"; });
         }
 
-        function loginAs(studentObj) {
-            currentStudent = studentObj;
-            localStorage.setItem('academyStudentData', JSON.stringify(currentStudent));
-            loadStudentPortal();
+        function loginAs(studentObj) { currentStudent = studentObj; localStorage.setItem('academyStudentData', JSON.stringify(currentStudent)); loadStudentPortal(); }
+        function logout() { localStorage.removeItem('academyStudentData'); currentStudent = null; window.location.reload(); }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`${tab}-screen`).classList.add('active');
+            const tabMap = { 'dashboard': 0, 'attendance': 1, 'fees': 2, 'exams': 3, 'videos': 4 };
+            document.querySelectorAll('.nav-item')[tabMap[tab]].classList.add('active');
         }
 
-        function logout() {
-            localStorage.removeItem('academyStudentData');
-            currentStudent = null;
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('login-screen').classList.add('active');
-            document.getElementById('bottom-nav').style.display = 'none';
-            document.getElementById('logout-btn').style.display = 'none';
-            document.getElementById('phone-input').value = '';
-            document.getElementById('sibling-selector').style.display = 'none';
-            document.getElementById('login-action-btn').style.display = 'block';
-            document.getElementById('login-action-btn').innerText = "Access Portal";
-        }
-
-        // =========================================================
-        // LOAD PORTAL DATA (Zero-Update Architecture)
-        // =========================================================
         function loadStudentPortal() {
-            document.getElementById('login-screen').classList.remove('active');
-            document.getElementById('bottom-nav').style.display = 'flex';
-            document.getElementById('logout-btn').style.display = 'block';
+            document.getElementById('login-screen').classList.remove('active'); document.getElementById('bottom-nav').style.display = 'flex'; document.getElementById('logout-btn').style.display = 'block';
             switchTab('dashboard');
 
-            // 1. Populate Dashboard & Fees
+            // 1. Setup Dashboard Basic Data
             document.getElementById('student-greeting').innerText = `Hey, ${currentStudent.Name.split(' ')[0]}! 👋`;
             document.getElementById('student-batch').innerText = `Class ${currentStudent.Class} | Batch ${currentStudent.Batch}`;
-            
-            const total = Number(currentStudent.TotalFee) || 0;
-            const paid = Number(currentStudent.PaidFee) || 0;
-            const pending = total - paid;
-            
-            // Dashboard Due
-            document.getElementById('dash-due').innerText = `₹${pending}`;
-            
-            // Fee Tab Detailed
-            document.getElementById('fee-total').innerText = `₹${total}`;
-            document.getElementById('fee-paid').innerText = `₹${paid}`;
-            document.getElementById('fee-pending').innerText = `₹${pending}`;
-            
-            const feePercent = total > 0 ? Math.round((paid / total) * 100) : 0;
-            document.getElementById('fee-progress').style.width = `${feePercent}%`;
-            document.getElementById('fee-percent-text').innerText = `${feePercent}% Paid`;
+            const total = Number(currentStudent.TotalFee) || 0; const paid = Number(currentStudent.PaidFee) || 0; const pending = total - paid;
+            document.getElementById('dash-due').innerText = `₹${pending}`; document.getElementById('fee-total').innerText = `₹${total}`; document.getElementById('fee-paid').innerText = `₹${paid}`; document.getElementById('fee-pending').innerText = `₹${pending}`;
+            const feePercent = total > 0 ? Math.round((paid / total) * 100) : 0; document.getElementById('fee-progress').style.width = `${feePercent}%`; document.getElementById('fee-percent-text').innerText = `${feePercent}% Paid`;
 
-            // 2. Fetch Attendance (Real-time Listener)
+            // 2. Fetch Attendance
             db.collection("Attendance").where("studentId", "==", currentStudent.id).onSnapshot((snapshot) => {
                 const listDiv = document.getElementById('attendance-list');
-                
-                if (snapshot.empty) {
-                    listDiv.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><h3 style="color: var(--text-dark);">No Records Yet</h3><p>Attendance data will appear here.</p></div>`;
-                    document.getElementById('dash-att').innerText = "N/A";
-                    return;
-                }
-
-                let records = [];
-                snapshot.forEach(doc => records.push(doc.data()));
-                records.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort newest first
-
-                let presentCount = 0;
-                let itemsHtml = '';
-
+                if (snapshot.empty) return listDiv.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><h3 style="color: var(--text-dark);">No Records Yet</h3></div>`;
+                let records = []; snapshot.forEach(doc => records.push(doc.data())); records.sort((a,b) => new Date(b.date) - new Date(a.date));
+                let presentCount = 0; let itemsHtml = '';
                 records.forEach(data => {
                     if(data.status === 'Present') presentCount++;
-                    
-                    const dateObj = new Date(data.date);
-                    const dateStr = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const dateStr = new Date(data.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
                     const statusColor = data.status === 'Present' ? 'var(--success)' : 'var(--danger)';
                     const icon = data.status === 'Present' ? 'fa-check-circle' : 'fa-times-circle';
-                    
-                    itemsHtml += `
-                        <div class="history-item">
-                            <span style="font-weight: 600; color: #555;">${dateStr}</span>
-                            <span style="font-weight: 700; color: ${statusColor};"><i class="fas ${icon}"></i> ${data.status}</span>
-                        </div>
-                    `;
+                    itemsHtml += `<div class="history-item"><span style="font-weight: 600; color: #555;">${dateStr}</span><span style="font-weight: 700; color: ${statusColor};"><i class="fas ${icon}"></i> ${data.status}</span></div>`;
                 });
-
-                listDiv.innerHTML = itemsHtml;
-
-                // Update Dashboard Percentage
-                const attPercent = Math.round((presentCount / records.length) * 100);
-                document.getElementById('dash-att').innerText = `${attPercent}%`;
+                listDiv.innerHTML = itemsHtml; document.getElementById('dash-att').innerText = `${Math.round((presentCount / records.length) * 100)}%`;
             });
 
-            // 3. Fetch Exams (Ready for Admin updates later)
-            db.collection("Exams")
-              .where("Class", "==", currentStudent.Class)
-              .where("Batch", "==", currentStudent.Batch)
-              .onSnapshot((snapshot) => {
+            // 3. Fetch Exams
+            db.collection("Exams").where("Class", "==", currentStudent.Class).where("Batch", "==", currentStudent.Batch).onSnapshot((snapshot) => {
                   const examList = document.getElementById('exams-list');
                   if (!snapshot.empty) {
-                      examList.innerHTML = ''; // Clear empty state
-                      snapshot.forEach(doc => {
-                          const exam = doc.data();
-                          // When you build the admin app, you will push data matching these field names:
-                          examList.innerHTML += `
-                            <div class="card">
-                                <h3 style="color: var(--primary-blue); margin-bottom: 5px;">${exam.Subject || 'Exam'}</h3>
-                                <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;"><i class="fas fa-calendar-day"></i> ${exam.Date || 'TBA'}</p>
-                                <div style="display: flex; justify-content: space-between; background: #f8fafc; padding: 10px; border-radius: 8px;">
-                                    <span style="font-weight: 600; color: #555;">Score:</span>
-                                    <span style="font-weight: 700; color: var(--text-dark);">${exam.Scores?.[currentStudent.id] || 'Not Graded Yet'}</span>
-                                </div>
-                            </div>
-                          `;
+                      examList.innerHTML = '';
+                      let exArray = []; snapshot.forEach(doc => exArray.push(doc.data())); exArray.sort((a,b)=>new Date(b.Date)-new Date(a.Date));
+                      exArray.forEach(exam => {
+                          const dateStr = new Date(exam.Date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                          examList.innerHTML += `<div class="card"><h3 style="color: var(--primary-blue); margin-bottom: 5px;">${exam.Title}</h3><p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">${exam.Subject} | <i class="fas fa-calendar-day"></i> ${dateStr}</p><div style="display: flex; justify-content: space-between; background: #f8fafc; padding: 10px; border-radius: 8px;"><span style="font-weight: 600; color: #555;">Score:</span><span style="font-weight: 700; color: var(--text-dark);">${exam.Scores?.[currentStudent.id] || 'Not Graded Yet'}</span></div></div>`;
                       });
                   }
             });
+
+            // 4. NEW: Fetch Videos (Netflix Style)
+            db.collection("Videos").where("Class", "==", currentStudent.Class).where("Batch", "==", currentStudent.Batch).onSnapshot((snapshot) => {
+                const videoList = document.getElementById('videos-list-container');
+                if (snapshot.empty) return videoList.innerHTML = `<div class="empty-state"><i class="fas fa-video-slash"></i><p>No videos available for your batch yet.</p></div>`;
+                
+                let videos = []; snapshot.forEach(doc => videos.push(doc.data()));
+                
+                // Group videos by Folder (Subject)
+                let folders = {};
+                videos.forEach(v => {
+                    if(!folders[v.Folder]) folders[v.Folder] = [];
+                    folders[v.Folder].push(v);
+                });
+
+                let html = '';
+                Object.keys(folders).sort().forEach(folderName => {
+                    html += `<div class="folder-title">${folderName}</div>`;
+                    
+                    // Sort videos in folder by newest first
+                    folders[folderName].sort((a,b)=> b.Timestamp - a.Timestamp).forEach(vid => {
+                        // High quality YouTube thumbnail URL
+                        const thumbUrl = `https://img.youtube.com/vi/${vid.VideoId}/maxresdefault.jpg`;
+                        
+                        html += `
+                        <div class="video-card" onclick="openPlayer('${vid.VideoId}', '${vid.Title.replace(/'/g, "\\'")}')">
+                            <div class="video-thumb" style="background-image: url('${thumbUrl}');">
+                                <div class="video-overlay"><i class="fas fa-play-circle"></i></div>
+                            </div>
+                            <div class="video-info">
+                                <h4>${vid.Title}</h4>
+                            </div>
+                        </div>`;
+                    });
+                });
+                videoList.innerHTML = html;
+            });
         }
 
         // =========================================================
-        // NAVIGATION
+        // VIDEO PLAYER CONTROLS
         // =========================================================
-        function switchTab(tab) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        function openPlayer(videoId, title) {
+            document.getElementById('player-title').innerText = title;
+            // Clean YouTube embed link to hide branding as much as legally possible
+            const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&showinfo=0&fs=1`;
             
-            document.getElementById(`${tab}-screen`).classList.add('active');
-            
-            // Map tab name to index for bottom nav highlight
-            const tabMap = { 'dashboard': 0, 'attendance': 1, 'fees': 2, 'exams': 3 };
-            document.querySelectorAll('.nav-item')[tabMap[tab]].classList.add('active');
+            document.getElementById('iframe-box').innerHTML = `<iframe src="${embedUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+            document.getElementById('video-player-modal').style.display = 'flex';
+        }
+
+        function closePlayer() {
+            document.getElementById('video-player-modal').style.display = 'none';
+            document.getElementById('iframe-box').innerHTML = ''; // Destroy iframe to stop audio
         }
     </script>
 </body>
