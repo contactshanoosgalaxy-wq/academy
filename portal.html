@@ -63,13 +63,18 @@
         .btn-del { background: #fecaca; color: #991b1b; border: none; padding: 8px; border-radius: 6px; flex: 1; font-weight: 600; cursor: pointer; }
 
         /* Attendance & Fees Elements */
-        .action-btns { display: flex; gap: 10px; }
+        .action-btns { display: flex; gap: 10px; margin-bottom: 8px;}
         .btn-present, .btn-absent { border: none; padding: 10px 15px; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; flex: 1; }
         .btn-present { background-color: var(--success); }
         .btn-absent { background-color: var(--danger); }
-        .status-tag { font-size: 0.8rem; padding: 5px 10px; border-radius: 20px; font-weight: 600; display: none; text-align: center; width: 100%;}
-        .tag-present { background: #d1fae5; color: #065f46; display: block; }
-        .tag-absent { background: #fee2e2; color: #991b1b; display: block; }
+        .status-tag { font-size: 0.8rem; padding: 5px 10px; border-radius: 20px; font-weight: 600; display: inline-block; text-align: center; width: 100%; margin-bottom: 8px;}
+        .tag-present { background: #d1fae5; color: #065f46; }
+        .tag-absent { background: #fee2e2; color: #991b1b; }
+        
+        /* NEW: History Button */
+        .btn-history { width: 100%; background: #e2e8f0; color: #333; border: none; padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.85rem;}
+        .btn-history:hover { background: #cbd5e1; }
+
         .fee-stats { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 15px; }
         .fee-stats div { text-align: center; }
         .fee-val { font-weight: 700; font-size: 1.1rem; display: block; }
@@ -82,10 +87,14 @@
         .admin-form label { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 5px; display: block;}
         .form-row { display: flex; gap: 10px; }
 
-        /* Edit Modal */
-        #edit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto;}
         .modal-close { float: right; cursor: pointer; font-size: 1.2rem; color: #888; }
+        
+        /* NEW: History Items inside Modal */
+        .history-item { display: flex; justify-content: space-between; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; }
+        .history-item:last-child { border-bottom: none; }
 
         /* Bottom Nav */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: var(--white); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: none; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 20; }
@@ -184,7 +193,7 @@
             </div>
         </div>
 
-        <div id="edit-modal">
+        <div id="edit-modal" class="modal-overlay">
             <div class="modal-content">
                 <i class="fas fa-times modal-close" onclick="closeEditModal()"></i>
                 <h3 style="margin-bottom: 15px; color: var(--primary-blue);">Edit Student</h3>
@@ -220,6 +229,16 @@
                     </div>
                 </div>
                 <button class="btn" onclick="saveEdit()"><i class="fas fa-save"></i> Update Details</button>
+            </div>
+        </div>
+
+        <div id="history-modal" class="modal-overlay">
+            <div class="modal-content">
+                <i class="fas fa-times modal-close" onclick="closeHistoryModal()"></i>
+                <h3 id="history-title" style="margin-bottom: 15px; color: var(--primary-blue);">Attendance History</h3>
+                <div id="history-list">
+                    <div style="text-align: center; color: #888;">Loading...</div>
+                </div>
             </div>
         </div>
 
@@ -415,16 +434,25 @@
             filtered.forEach(student => {
                 if (currentBatchMode === 'attendance') {
                     let actionHtml = '';
+                    
+                    // The new "View History" button
+                    let historyBtn = `<button class="btn-history" onclick="viewHistory('${student.id}', '${student.Name}')"><i class="fas fa-calendar-alt"></i> View History</button>`;
+
                     if (markedToday[student.id]) {
                         const status = markedToday[student.id];
                         const tagClass = status === 'Present' ? 'tag-present' : 'tag-absent';
-                        actionHtml = `<span class="status-tag ${tagClass}">Marked: ${status}</span>`;
+                        actionHtml = `
+                            <div style="text-align: center;">
+                                <span class="status-tag ${tagClass}">Marked: ${status}</span>
+                                ${historyBtn}
+                            </div>`;
                     } else {
                         actionHtml = `
                             <div class="action-btns">
                                 <button class="btn-present" onclick="markAttendance('${student.id}', '${student.Name}', 'Present')">Present</button>
                                 <button class="btn-absent" onclick="markAttendance('${student.id}', '${student.Name}', 'Absent')">Absent</button>
-                            </div>`;
+                            </div>
+                            ${historyBtn}`;
                     }
                     container.innerHTML += `
                         <div class="card">
@@ -484,35 +512,10 @@
         // =========================================================
         function markAttendance(id, name, status) {
             const today = new Date().toISOString().split('T')[0];
-            
-            // 1. Save to Firebase
             db.collection("Attendance").doc(`${id}_${today}`).set({
                 studentId: id, studentName: name, date: today, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                
-                // 2. 100% FREE INSTANT SMS VIA MACRODROID
-                if (status === 'Absent') {
-                    const studentData = allStudents.find(s => s.id === id);
-                    
-                    if (studentData && studentData.Phone) {
-                        // Ensure India country code (+91) is added
-                        let phoneToMessage = studentData.Phone.length === 10 ? '+91' + studentData.Phone : studentData.Phone;
-
-                        // =======================================================
-                        // PASTE YOUR MACRODROID DEVICE ID HERE
-                        const deviceID = "https://trigger.macrodroid.com/ee13ca12-a33c-404d-9e1c-c0e968ae522f/absent_alert";
-                        // =======================================================
-                        
-                        // We attach the phone and name directly into the URL
-                        const macroUrl = `https://trigger.macrodroid.com/${deviceID}/absent_alert?phone=${encodeURIComponent(phoneToMessage)}&name=${encodeURIComponent(name)}`;
-
-                        // Send the invisible ping to the phone (no-cors prevents browser blocks)
-                        fetch(macroUrl, { mode: 'no-cors' }).then(() => {
-                            console.log("MacroDroid SMS triggered for " + name);
-                        }).catch(err => console.error("MacroDroid error: ", err));
-                    }
-                }
             }); 
+            // Note: I removed the SMS hook here so it just cleanly marks attendance.
         }
 
         function recordPayment(id, name, currentPaid, pending) {
@@ -556,66 +559,33 @@
             }
         }
 
-        // =========================================================
-        // NEW: TRIPLE-LOCK BULK DELETE BATCH
-        // =========================================================
         function deleteCurrentBatch() {
             const batchName = `${currentViewClass} - ${currentViewBatch}`;
-            
-            // Lock 1: Standard Warning
             if (!confirm(`⚠️ CRITICAL WARNING:\nAre you sure you want to permanently delete ALL students in ${batchName}?`)) return;
-
-            // Lock 2: Type Confirmation
             let checkWord = prompt(`⚠️ SECOND WARNING:\nThis will erase every student in this batch.\nType the word DELETE (in all caps) to confirm.`);
-            if (checkWord !== "DELETE") {
-                alert("Batch deletion cancelled.");
-                return;
-            }
-
-            // Lock 3: Admin Password Verification
+            if (checkWord !== "DELETE") { alert("Batch deletion cancelled."); return; }
             let pwd = prompt(`🔐 FINAL SECURITY CHECK:\nEnter your Admin Login Password to permanently destroy ${batchName}.`);
-            if (pwd === null || pwd.trim() === "") {
-                alert("Password required. Deletion cancelled.");
-                return;
-            }
+            if (pwd === null || pwd.trim() === "") { alert("Password required. Deletion cancelled."); return; }
 
-            // Verify Password & Execute Bulk Delete
             const userEmail = auth.currentUser.email;
-            auth.signInWithEmailAndPassword(userEmail, pwd)
-                .then(() => {
-                    // Password correct! Find all students in this batch
-                    db.collection("Students")
-                        .where("Class", "==", currentViewClass)
-                        .where("Batch", "==", currentViewBatch)
-                        .get()
-                        .then((querySnapshot) => {
-                            // Use a Firestore Batch to delete them all efficiently
-                            const firestoreBatch = db.batch();
-                            querySnapshot.forEach((doc) => {
-                                firestoreBatch.delete(doc.ref);
-                            });
-                            
-                            return firestoreBatch.commit(); // Execute the mass deletion
-                        })
-                        .then(() => {
-                            alert(`✅ Entire batch (${batchName}) has been permanently deleted.`);
-                            switchTab('dashboard'); // Kick them back to the main menu (the folder will disappear automatically)
-                        })
-                        .catch((error) => {
-                            console.error("Error removing batch: ", error);
-                            alert("Error deleting batch. Check internet connection.");
-                        });
-                })
-                .catch(err => {
-                    alert("❌ Incorrect Password. Batch deletion blocked.");
-                });
+            auth.signInWithEmailAndPassword(userEmail, pwd).then(() => {
+                db.collection("Students").where("Class", "==", currentViewClass).where("Batch", "==", currentViewBatch).get().then((querySnapshot) => {
+                    const firestoreBatch = db.batch();
+                    querySnapshot.forEach((doc) => { firestoreBatch.delete(doc.ref); });
+                    return firestoreBatch.commit(); 
+                }).then(() => {
+                    alert(`✅ Entire batch (${batchName}) has been permanently deleted.`);
+                    switchTab('dashboard'); 
+                }).catch((error) => { alert("Error deleting batch. Check internet connection."); });
+            }).catch(err => { alert("❌ Incorrect Password. Batch deletion blocked."); });
         }
 
-        // EDIT MODAL LOGIC
+        // =========================================================
+        // MODALS (EDIT & HISTORY)
+        // =========================================================
         function openEditModal(id) {
             const student = allStudents.find(s => s.id === id);
             if(!student) return;
-            
             document.getElementById('edit-id').value = student.id;
             document.getElementById('edit-name').value = student.Name;
             document.getElementById('edit-phone').value = student.Phone;
@@ -623,7 +593,6 @@
             document.getElementById('edit-batch').value = student.Batch;
             document.getElementById('edit-total').value = student.TotalFee || 0;
             document.getElementById('edit-paid').value = student.PaidFee || 0;
-            
             document.getElementById('edit-modal').style.display = 'flex';
         }
 
@@ -632,12 +601,7 @@
         function saveEdit() {
             const id = document.getElementById('edit-id').value;
             let batch = document.getElementById('edit-batch').value.trim().toUpperCase();
-            
-            if(!/^[A-Z]\d+$/.test(batch)) {
-                alert("Invalid Batch format! Please use a letter followed by a number (e.g., A1).");
-                return;
-            }
-
+            if(!/^[A-Z]\d+$/.test(batch)) { alert("Invalid Batch format! Please use a letter followed by a number (e.g., A1)."); return; }
             db.collection("Students").doc(id).update({
                 Name: document.getElementById('edit-name').value,
                 Phone: document.getElementById('edit-phone').value,
@@ -649,6 +613,75 @@
                 closeEditModal();
                 alert("Student updated!");
             });
+        }
+
+        // NEW: VIEW HISTORY LOGIC
+        function viewHistory(studentId, studentName) {
+            document.getElementById('history-title').innerText = `${studentName}'s History`;
+            const listDiv = document.getElementById('history-list');
+            listDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">Fetching records...</div>';
+            document.getElementById('history-modal').style.display = 'flex';
+
+            db.collection("Attendance")
+              .where("studentId", "==", studentId)
+              .get()
+              .then((snapshot) => {
+                  if (snapshot.empty) {
+                      listDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">No attendance records found yet.</div>';
+                      return;
+                  }
+
+                  let records = [];
+                  snapshot.forEach(doc => records.push(doc.data()));
+
+                  // Sort dates from newest to oldest
+                  records.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                  let presentCount = 0;
+                  let totalCount = records.length;
+                  let itemsHtml = '';
+
+                  records.forEach(data => {
+                      if(data.status === 'Present') presentCount++;
+                      
+                      // Convert YYYY-MM-DD to a nice format like "24 Apr 2026"
+                      const dateObj = new Date(data.date);
+                      const dateStr = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                      const statusColor = data.status === 'Present' ? 'var(--success)' : 'var(--danger)';
+                      
+                      itemsHtml += `
+                          <div class="history-item">
+                              <span style="font-weight: 600; color: #555;"><i class="fas fa-calendar-day" style="color: #ccc; margin-right: 5px;"></i>${dateStr}</span>
+                              <span style="font-weight: 700; color: ${statusColor};">${data.status}</span>
+                          </div>
+                      `;
+                  });
+
+                  // Calculate percentage
+                  const percent = Math.round((presentCount / totalCount) * 100);
+                  let percentColor = percent >= 75 ? 'var(--success)' : (percent >= 50 ? '#f59e0b' : 'var(--danger)');
+
+                  const summaryHtml = `
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 0.9rem; color: #555; font-weight: 600;">Overall Attendance</div>
+                        <div style="color: ${percentColor}; font-size: 2rem; font-weight: 700; margin: 5px 0;">${percent}%</div>
+                        <div style="font-size: 0.8rem; color: #888;">
+                            <span style="color: var(--success); font-weight:bold;">${presentCount} Present</span> &nbsp;|&nbsp; 
+                            <span style="color: var(--danger); font-weight:bold;">${totalCount - presentCount} Absent</span>
+                        </div>
+                    </div>
+                  `;
+
+                  listDiv.innerHTML = summaryHtml + itemsHtml;
+              })
+              .catch(error => {
+                  console.error(error);
+                  listDiv.innerHTML = '<div style="text-align: center; color: red; padding: 20px;">Error loading history.</div>';
+              });
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('history-modal').style.display = 'none';
         }
     </script>
 </body>
