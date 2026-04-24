@@ -86,6 +86,7 @@
                 <h2 style="color: var(--primary-blue);">Welcome Back</h2>
                 <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Enter your registered WhatsApp number to view your profile.</p>
                 <input type="tel" id="phone-input" class="form-control" placeholder="10-digit Phone Number">
+                <input type="password" id="pin-input" class="form-control" placeholder="4-Digit PIN" maxlength="4">
                 <button class="btn" id="login-action-btn" onclick="checkPhone()">Access Portal</button>
                 <p id="error-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; font-weight: 600;"></p>
                 <div id="sibling-selector"><p style="font-size: 0.9rem; color: var(--primary-blue); font-weight: bold; margin-bottom: 10px;">Select Student:</p><div id="sibling-buttons"></div></div>
@@ -172,21 +173,32 @@
         };
 
         function checkPhone() {
-            const phone = document.getElementById('phone-input').value.trim(); const errorMsg = document.getElementById('error-msg'); const btn = document.getElementById('login-action-btn');
-            if (phone.length < 10) return errorMsg.innerText = "Please enter a valid phone number.";
-            btn.innerText = "Searching..."; errorMsg.innerText = "";
+    const phone = document.getElementById('phone-input').value.trim(); 
+    const pin = document.getElementById('pin-input').value.trim(); // NEW
+    const errorMsg = document.getElementById('error-msg'); 
+    const btn = document.getElementById('login-action-btn');
+    
+    if (phone.length < 10) return errorMsg.innerText = "Please enter a valid phone number.";
+    if (pin.length < 4) return errorMsg.innerText = "Please enter your 4-digit PIN.";
+    
+    btn.innerText = "Searching..."; errorMsg.innerText = "";
 
-            db.collection("Students").where("Phone", "==", phone).get().then((snapshot) => {
-                if (snapshot.empty) { errorMsg.innerText = "Phone number not found."; btn.innerText = "Access Portal"; return; }
-                let matches = []; snapshot.forEach(doc => matches.push({ id: doc.id, ...doc.data() }));
-                if (matches.length === 1) { loginAs(matches[0]); } 
-                else {
-                    btn.style.display = 'none'; document.getElementById('sibling-selector').style.display = 'block';
-                    let siblingHtml = ''; matches.forEach(student => { siblingHtml += `<button class="btn sibling-btn" onclick='loginAs(${JSON.stringify(student)})'>${student.Name} (${student.Class})</button>`; });
-                    document.getElementById('sibling-buttons').innerHTML = siblingHtml;
-                }
-            }).catch(error => { errorMsg.innerText = "Connection error."; btn.innerText = "Access Portal"; });
+    // The database now requires BOTH the phone and the exact PIN to match
+    db.collection("Students").where("Phone", "==", phone).where("Pin", "==", pin).get().then((snapshot) => {
+        if (snapshot.empty) { 
+            errorMsg.innerText = "Incorrect Phone Number or PIN."; 
+            btn.innerText = "Access Portal"; 
+            return; 
         }
+        let matches = []; snapshot.forEach(doc => matches.push({ id: doc.id, ...doc.data() }));
+        if (matches.length === 1) { loginAs(matches[0]); } 
+        else {
+            btn.style.display = 'none'; document.getElementById('sibling-selector').style.display = 'block';
+            let siblingHtml = ''; matches.forEach(student => { siblingHtml += `<button class="btn sibling-btn" onclick='loginAs(${JSON.stringify(student)})'>${student.Name} (${student.Class})</button>`; });
+            document.getElementById('sibling-buttons').innerHTML = siblingHtml;
+        }
+    }).catch(error => { errorMsg.innerText = "Connection error."; btn.innerText = "Access Portal"; });
+}
 
         function loginAs(studentObj) { currentStudent = studentObj; localStorage.setItem('academyStudentData', JSON.stringify(currentStudent)); loadStudentPortal(); }
         function logout() { localStorage.removeItem('academyStudentData'); currentStudent = null; window.location.reload(); }
