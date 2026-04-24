@@ -128,6 +128,8 @@
             <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-user-plus"></i> Add Admission</h2>
             <div class="admin-form">
                 <input type="text" id="new-name" class="form-control" placeholder="Full Name"><input type="tel" id="new-phone" class="form-control" placeholder="10-digit number">
+                <label style="font-size: 0.8rem; font-weight: 600; margin-top: 10px;">4-Digit Security PIN (For Student Login)</label>
+                <input type="number" id="new-pin" class="form-control" placeholder="e.g., 1234" maxlength="4">
                 <div class="form-row"><div style="flex: 1;"><select id="new-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><input type="text" id="new-batch" class="form-control" placeholder="Batch (e.g. A1)" maxlength="3"></div></div>
                 <div class="form-row"><div style="flex: 1;"><input type="number" id="new-total" class="form-control" placeholder="Total Fee"></div><div style="flex: 1;"><input type="number" id="new-paid" class="form-control" placeholder="Paid"></div></div>
                 <button class="btn" onclick="addNewStudent()"><i class="fas fa-save"></i> Save Student</button>
@@ -148,7 +150,8 @@
             <button class="btn" onclick="uploadVideo()"><i class="fas fa-upload"></i> Publish Video</button></div>
         </div>
 
-        <div id="edit-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="closeEditModal()"></i><h3 style="margin-bottom: 15px; color: var(--primary-blue);">Edit</h3><input type="hidden" id="edit-id"><input type="text" id="edit-name" class="form-control"><input type="text" id="edit-phone" class="form-control"><div class="form-row"><div style="flex: 1;"><select id="edit-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><input type="text" id="edit-batch" class="form-control" maxlength="3"></div></div><div class="form-row"><div style="flex: 1;"><input type="number" id="edit-total" class="form-control"></div><div style="flex: 1;"><input type="number" id="edit-paid" class="form-control"></div></div><button class="btn" onclick="saveEdit()"><i class="fas fa-save"></i> Save</button></div></div>
+        <div id="edit-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="closeEditModal()"></i><h3 style="margin-bottom: 15px; color: var(--primary-blue);">Edit</h3><input type="hidden" id="edit-id"><input type="text" id="edit-name" class="form-control"><input type="text" id="edit-phone" class="form-control"><label style="font-size: 0.8rem; font-weight: 600;">4-Digit PIN</label>
+<input type="number" id="edit-pin" class="form-control" placeholder="e.g. 1234" maxlength="4"><div class="form-row"><div style="flex: 1;"><select id="edit-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><input type="text" id="edit-batch" class="form-control" maxlength="3"></div></div><div class="form-row"><div style="flex: 1;"><input type="number" id="edit-total" class="form-control"></div><div style="flex: 1;"><input type="number" id="edit-paid" class="form-control"></div></div><button class="btn" onclick="saveEdit()"><i class="fas fa-save"></i> Save</button></div></div>
         <div id="history-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="closeHistoryModal()"></i><h3 id="history-title" style="margin-bottom: 15px; color: var(--primary-blue);">History</h3><div id="history-list"></div></div></div>
 
         <nav class="bottom-nav" id="bottom-nav">
@@ -296,15 +299,101 @@
         function openBatchView(c, b) { currentViewClass = c; currentViewBatch = b; document.getElementById('current-batch-title').innerText = `${c} - ${b}`; selectedDate = new Date().toISOString().split('T')[0]; document.getElementById('view-date').value = selectedDate; changeDate(); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('batch-screen').classList.add('active'); renderBatchList(); }
         function toggleBatchMode(m) { currentBatchMode = m; document.getElementById('btn-att').className = `tab-btn ${m==='attendance'?'active':''}`; document.getElementById('btn-fee').className = `tab-btn ${m==='fees'?'active':''}`; document.getElementById('attendance-date-box').style.display = (m === 'attendance') ? 'flex' : 'none'; renderBatchList(); }
         function renderBatchList() { const container = document.getElementById('batch-list-container'); container.innerHTML = ''; const filtered = allStudents.filter(s => s.Class === currentViewClass && s.Batch === currentViewBatch); filtered.forEach(student => { if (currentBatchMode === 'attendance') { let btn = `<button class="btn-history" onclick="viewHistory('${student.id}', '${student.Name}')"><i class="fas fa-calendar-alt"></i> History</button>`; if (markedToday[student.id]) { container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div style="text-align:center;"><span class="status-tag ${markedToday[student.id]==='Present'?'tag-present':'tag-absent'}">Marked: ${markedToday[student.id]}</span>${btn}</div></div>`; } else { container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="action-btns"><button class="btn-present" onclick="markAttendance('${student.id}', '${student.Name}', 'Present')">Present</button><button class="btn-absent" onclick="markAttendance('${student.id}', '${student.Name}', 'Absent')">Absent</button></div>${btn}</div>`; } } else { const t = Number(student.TotalFee) || 0; const p = Number(student.PaidFee) || 0; const pend = t - p; container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="fee-stats"><div><span style="color:#888;">Total</span><span class="fee-val">₹${t}</span></div><div><span style="color:#888;">Paid</span><span class="fee-val text-success">₹${p}</span></div><div><span style="color:#888;">Pending</span><span class="fee-val text-danger">₹${pend}</span></div></div><button class="btn-pay" onclick="recordPayment('${student.id}', '${student.Name}', ${p}, ${pend})">Record Payment</button></div>`; } }); }
-        function renderDirectory() { const container = document.getElementById('directory-list'); const query = document.getElementById('search-input').value.toLowerCase(); container.innerHTML = ''; allStudents.filter(s => s.Name.toLowerCase().includes(query) || (s.Phone && s.Phone.includes(query))).forEach(student => { container.innerHTML += `<div class="card"><div class="card-header"><h3>${student.Name}</h3><span class="badge">${student.Class} - ${student.Batch}</span></div><p style="font-size:0.85rem; color:#666; margin-bottom:10px;"><i class="fas fa-phone"></i> ${student.Phone}</p><div class="dir-actions"><button class="btn-edit" onclick="openEditModal('${student.id}')"><i class="fas fa-edit"></i> Edit</button><button class="btn-del" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i> Del</button></div></div>`; }); }
+        function renderDirectory() { 
+    const container = document.getElementById('directory-list'); 
+    const query = document.getElementById('search-input').value.toLowerCase(); 
+    container.innerHTML = ''; 
+
+    if(query === "") {
+        container.innerHTML = `<div style="text-align: center; color: #888; padding: 40px 20px;"><i class="fas fa-search" style="font-size: 2rem; margin-bottom:10px; color:#ccc;"></i><br>Type a name or phone number to search.</div>`;
+        return;
+    }
+
+    // Stop after finding the first 20 matches (Huge Performance Boost)
+    const filtered = allStudents.filter(s => s.Name.toLowerCase().includes(query) || (s.Phone && s.Phone.includes(query))).slice(0, 20);
+    
+    if(filtered.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No students found.</div>`;
+        return;
+    }
+
+    filtered.forEach(student => { 
+        container.innerHTML += `
+        <div class="card">
+            <div class="card-header">
+                <h3>${student.Name}</h3>
+                <span class="badge">${student.Class} - ${student.Batch}</span>
+            </div>
+            <p style="font-size:0.85rem; color:#666; margin-bottom:10px;">
+                <i class="fas fa-phone"></i> ${student.Phone} &nbsp;|&nbsp; 
+                <i class="fas fa-key"></i> PIN: <strong style="color:var(--danger);">${student.Pin || 'N/A'}</strong>
+            </p>
+            <div class="dir-actions">
+                <button class="btn-edit" onclick="openEditModal('${student.id}')"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn-del" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i> Del</button>
+            </div>
+        </div>`; 
+    }); 
+}
         function markAttendance(id, name, status) { db.collection("Attendance").doc(`${id}_${selectedDate}`).set({ studentId: id, studentName: name, date: selectedDate, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); }
         function recordPayment(id, name, cPaid, pending) { if(pending<=0) return alert("Fully paid!"); let amt = parseInt(prompt(`Pending: ₹${pending}\nAmount:`)); if(!isNaN(amt) && amt>0) db.collection("Students").doc(id).update({ PaidFee: cPaid + amt }); }
-        function addNewStudent() { const n = document.getElementById('new-name').value.trim(); const p = document.getElementById('new-phone').value.trim(); const c = document.getElementById('new-class').value; let b = document.getElementById('new-batch').value.trim().toUpperCase(); const t = Number(document.getElementById('new-total').value); const pd = Number(document.getElementById('new-paid').value); if(!n || !p) return alert("Missing fields"); if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch"); db.collection("Students").add({ Name: n, Phone: p, Class: c, Batch: b, TotalFee: t, PaidFee: pd }).then(() => { alert("Added!"); document.getElementById('new-name').value=''; document.getElementById('new-phone').value=''; document.getElementById('new-batch').value=''; switchTab('dashboard'); }); }
+        function addNewStudent() { 
+    const n = document.getElementById('new-name').value.trim(); 
+    const p = document.getElementById('new-phone').value.trim(); 
+    const pin = document.getElementById('new-pin').value.trim(); // NEW
+    const c = document.getElementById('new-class').value; 
+    let b = document.getElementById('new-batch').value.trim().toUpperCase(); 
+    const t = Number(document.getElementById('new-total').value); 
+    const pd = Number(document.getElementById('new-paid').value); 
+    
+    if(!n || !p || !pin) return alert("Missing fields! Make sure to add a PIN."); 
+    if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch"); 
+    
+    db.collection("Students").add({ 
+        Name: n, Phone: p, Pin: pin, Class: c, Batch: b, TotalFee: t, PaidFee: pd 
+    }).then(() => { 
+        alert("Added!"); 
+        document.getElementById('new-name').value=''; 
+        document.getElementById('new-phone').value=''; 
+        document.getElementById('new-pin').value=''; 
+        document.getElementById('new-batch').value=''; 
+        switchTab('dashboard'); 
+    }); 
+}
         function deleteStudent(id, name) { if(prompt(`Type DELETE to confirm ${name}`)==="DELETE") { let pwd = prompt("Admin Password:"); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(()=>db.collection("Students").doc(id).delete().then(()=>alert("Deleted"))).catch(()=>alert("Wrong Password")); } }
         function deleteCurrentBatch() { let batch = `${currentViewClass} - ${currentViewBatch}`; if(prompt("Type DELETE to erase batch")==="DELETE") { let pwd = prompt("Admin Password:"); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(()=>{ db.collection("Students").where("Class","==",currentViewClass).where("Batch","==",currentViewBatch).get().then(snap=>{ const b = db.batch(); snap.forEach(d=>b.delete(d.ref)); return b.commit(); }).then(()=>{alert("Deleted");switchTab('dashboard');}); }); } }
-        function openEditModal(id) { const s = allStudents.find(x=>x.id===id); if(!s) return; document.getElementById('edit-id').value=s.id; document.getElementById('edit-name').value=s.Name; document.getElementById('edit-phone').value=s.Phone; document.getElementById('edit-class').value=s.Class; document.getElementById('edit-batch').value=s.Batch; document.getElementById('edit-total').value=s.TotalFee||0; document.getElementById('edit-paid').value=s.PaidFee||0; document.getElementById('edit-modal').style.display='flex'; }
+       function openEditModal(id) { 
+    const s = allStudents.find(x=>x.id===id); 
+    if(!s) return; 
+    document.getElementById('edit-id').value=s.id; 
+    document.getElementById('edit-name').value=s.Name; 
+    document.getElementById('edit-phone').value=s.Phone; 
+    document.getElementById('edit-pin').value=s.Pin || ''; // <-- Pulls the PIN from database
+    document.getElementById('edit-class').value=s.Class; 
+    document.getElementById('edit-batch').value=s.Batch; 
+    document.getElementById('edit-total').value=s.TotalFee||0; 
+    document.getElementById('edit-paid').value=s.PaidFee||0; 
+    document.getElementById('edit-modal').style.display='flex'; 
+}
         function closeEditModal() { document.getElementById('edit-modal').style.display='none'; }
-        function saveEdit() { const id = document.getElementById('edit-id').value; let b = document.getElementById('edit-batch').value.trim().toUpperCase(); if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch"); db.collection("Students").doc(id).update({ Name: document.getElementById('edit-name').value, Phone: document.getElementById('edit-phone').value, Class: document.getElementById('edit-class').value, Batch: b, TotalFee: Number(document.getElementById('edit-total').value), PaidFee: Number(document.getElementById('edit-paid').value) }).then(()=>closeEditModal()); }
+        function saveEdit() { 
+    const id = document.getElementById('edit-id').value; 
+    let b = document.getElementById('edit-batch').value.trim().toUpperCase(); 
+    let pin = document.getElementById('edit-pin').value.trim(); // <-- Grabs the new PIN
+
+    if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch"); 
+    if(!pin) return alert("PIN cannot be empty!");
+    
+    db.collection("Students").doc(id).update({ 
+        Name: document.getElementById('edit-name').value, 
+        Phone: document.getElementById('edit-phone').value, 
+        Pin: pin, // <-- Saves PIN to database
+        Class: document.getElementById('edit-class').value, 
+        Batch: b, 
+        TotalFee: Number(document.getElementById('edit-total').value), 
+        PaidFee: Number(document.getElementById('edit-paid').value) 
+    }).then(()=>closeEditModal()); 
+}
         function viewHistory(sId, sName) { document.getElementById('history-title').innerText = `${sName}'s History`; document.getElementById('history-modal').style.display='flex'; document.getElementById('history-list').innerHTML = "Loading..."; db.collection("Attendance").where("studentId","==",sId).get().then(snap => { if(snap.empty) return document.getElementById('history-list').innerHTML = "No records."; let recs = []; snap.forEach(d=>recs.push(d.data())); recs.sort((a,b)=>new Date(b.date)-new Date(a.date)); let pres = recs.filter(r=>r.status==='Present').length; let html = `<div><b>${Math.round((pres/recs.length)*100)}%</b> Overall</div>`; recs.forEach(r => html += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee;"><span>${r.date}</span><b>${r.status}</b></div>`); document.getElementById('history-list').innerHTML = html; }); }
         function closeHistoryModal() { document.getElementById('history-modal').style.display='none'; }
         function createNewExam() { const title = document.getElementById('ex-title').value.trim(); const subject = document.getElementById('ex-subject').value.trim(); const date = document.getElementById('ex-date').value; const cls = document.getElementById('ex-class').value; let batch = document.getElementById('ex-batch').value.trim().toUpperCase(); if(!title || !subject || !date) return alert("Required!"); if (batch === "") { let batchesForClass = new Set(allStudents.filter(s => s.Class === cls).map(s => s.Batch)); if(batchesForClass.size === 0) return alert(`No students in Class ${cls}`); let batchPromises = Array.from(batchesForClass).map(b => db.collection("Exams").add({ Title: title, Subject: subject, Date: date, Class: cls, Batch: b, Scores: {} })); Promise.all(batchPromises).then(() => { alert(`Success!`); document.getElementById('add-exam-modal').style.display='none'; }); } else { db.collection("Exams").add({ Title: title, Subject: subject, Date: date, Class: cls, Batch: batch, Scores: {} }).then(() => { alert("Scheduled!"); document.getElementById('add-exam-modal').style.display='none'; }); } }
