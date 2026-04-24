@@ -140,21 +140,12 @@
             <button class="btn" onclick="createNewExam()"><i class="fas fa-plus-circle"></i> Create</button></div>
         </div>
 
-        <div id="add-vid-modal" class="modal-overlay">
-            <div class="modal-content"><i class="fas fa-times modal-close" onclick="document.getElementById('add-vid-modal').style.display='none'"></i>
-                <h3 style="margin-bottom: 15px; color: var(--primary-blue);">Upload Video</h3>
-                <label style="font-size:0.8rem; font-weight:600;">Video Title</label>
-                <input type="text" id="vid-title" class="form-control" placeholder="e.g. Chapter 1: Motion">
-                <label style="font-size:0.8rem; font-weight:600;">YouTube Link (Unlisted/Public)</label>
-                <input type="text" id="vid-link" class="form-control" placeholder="https://youtu.be/...">
-                <label style="font-size:0.8rem; font-weight:600;">Folder / Subject Name</label>
-                <input type="text" id="vid-folder" class="form-control" placeholder="e.g. Physics">
-                <div class="form-row">
-                    <div style="flex: 1;"><label style="font-size:0.8rem; font-weight:600;">Target Class</label><select id="vid-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div>
-                    <div style="flex: 1;"><label style="font-size:0.8rem; font-weight:600;">Target Batch</label><input type="text" id="vid-batch" class="form-control" placeholder="Leave blank for ALL"></div>
-                </div>
-                <button class="btn" onclick="uploadVideo()"><i class="fas fa-upload"></i> Publish Video</button>
-            </div>
+        <div id="add-vid-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="document.getElementById('add-vid-modal').style.display='none'"></i><h3 style="margin-bottom: 15px; color: var(--primary-blue);">Upload Video</h3>
+            <label style="font-size:0.8rem; font-weight:600;">Video Title</label><input type="text" id="vid-title" class="form-control" placeholder="e.g. Chapter 1: Motion">
+            <label style="font-size:0.8rem; font-weight:600;">YouTube Link</label><input type="text" id="vid-link" class="form-control" placeholder="https://youtu.be/...">
+            <label style="font-size:0.8rem; font-weight:600;">Subject Folder</label><input type="text" id="vid-folder" class="form-control" placeholder="e.g. Physics">
+            <div class="form-row"><div style="flex: 1;"><label style="font-size:0.8rem; font-weight:600;">Target Class</label><select id="vid-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><label style="font-size:0.8rem; font-weight:600;">Target Batch</label><input type="text" id="vid-batch" class="form-control" placeholder="Blank for ALL"></div></div>
+            <button class="btn" onclick="uploadVideo()"><i class="fas fa-upload"></i> Publish Video</button></div>
         </div>
 
         <div id="edit-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="closeEditModal()"></i><h3 style="margin-bottom: 15px; color: var(--primary-blue);">Edit</h3><input type="hidden" id="edit-id"><input type="text" id="edit-name" class="form-control"><input type="text" id="edit-phone" class="form-control"><div class="form-row"><div style="flex: 1;"><select id="edit-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><input type="text" id="edit-batch" class="form-control" maxlength="3"></div></div><div class="form-row"><div style="flex: 1;"><input type="number" id="edit-total" class="form-control"></div><div style="flex: 1;"><input type="number" id="edit-paid" class="form-control"></div></div><button class="btn" onclick="saveEdit()"><i class="fas fa-save"></i> Save</button></div></div>
@@ -189,7 +180,13 @@
             }
         });
 
-        function login() { auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value).catch(err => document.getElementById('error-msg').innerText = "Error: " + err.message); }
+        // NEW: AUTO LOGOUT (Session Persistence)
+        function login() { 
+            auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).then(() => {
+                return auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value);
+            }).catch(err => document.getElementById('error-msg').innerText = "Error: " + err.message); 
+        }
+        
         document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
         function switchTab(tab) {
@@ -204,60 +201,95 @@
 
         function initRealtimeDataSync() {
             db.collection("Students").onSnapshot((snap) => { allStudents = []; snap.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() })); allStudents.sort((a,b)=>a.Name.localeCompare(b.Name)); if(document.getElementById('dashboard-screen').classList.contains('active')) renderFolders(); if(document.getElementById('directory-screen').classList.contains('active')) renderDirectory(); if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList(); });
-            db.collection("Exams").onSnapshot((snap) => { allExams = []; snap.forEach(doc => allExams.push({ id: doc.id, ...doc.data() })); allExams.sort((a,b)=>new Date(b.Date)-new Date(a.Date)); if(document.getElementById('exams-screen').classList.contains('active')) renderExamsList(); });
-            // Sync Videos
-            db.collection("Videos").onSnapshot((snap) => { allVideos = []; snap.forEach(doc => allVideos.push({ id: doc.id, ...doc.data() })); allVideos.sort((a,b)=>b.Timestamp - a.Timestamp); if(document.getElementById('videos-screen').classList.contains('active')) renderVideosList(); });
+            db.collection("Exams").onSnapshot((snap) => { allExams = []; snap.forEach(doc => allExams.push({ id: doc.id, ...doc.data() })); if(document.getElementById('exams-screen').classList.contains('active')) renderExamsList(); });
+            db.collection("Videos").onSnapshot((snap) => { allVideos = []; snap.forEach(doc => allVideos.push({ id: doc.id, ...doc.data() })); if(document.getElementById('videos-screen').classList.contains('active')) renderVideosList(); });
         }
 
-        // --- VIDEOS LOGIC ---
-        function extractYTId(url) {
-            let match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
+        // =========================================================
+        // NEW: OPTIMIZED EXAM & VIDEO RENDERING (VISUAL GROUPING)
+        // =========================================================
+        
+        function renderExamsList() {
+            const container = document.getElementById('exams-list-container'); container.innerHTML = '';
+            if(allExams.length === 0) return container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No exams scheduled.</div>`;
 
-        function uploadVideo() {
-            const title = document.getElementById('vid-title').value.trim();
-            const link = document.getElementById('vid-link').value.trim();
-            const folder = document.getElementById('vid-folder').value.trim();
-            const cls = document.getElementById('vid-class').value;
-            let batch = document.getElementById('vid-batch').value.trim().toUpperCase();
+            // Group duplicate exams based on Title, Class, and Date
+            let groupedExams = {};
+            allExams.forEach(e => {
+                let key = `${e.Title}_${e.Class}_${e.Date}`;
+                if(!groupedExams[key]) groupedExams[key] = { Title: e.Title, Class: e.Class, Date: e.Date, Subject: e.Subject, Batches: [] };
+                groupedExams[key].Batches.push({ batch: e.Batch, id: e.id, scores: e.Scores || {} });
+            });
 
-            if(!title || !link || !folder) return alert("Title, Link, and Folder are required!");
-            let vidId = extractYTId(link);
-            if(!vidId) return alert("Invalid YouTube link!");
+            // Sort grouped exams by date (Newest first)
+            Object.values(groupedExams).sort((a,b) => new Date(b.Date) - new Date(a.Date)).forEach(exam => {
+                const prettyDate = new Date(exam.Date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                
+                // Create a grade button for each batch attached to this exam
+                let batchButtons = '';
+                exam.Batches.forEach(b => {
+                    const gradedCount = Object.keys(b.scores).length;
+                    batchButtons += `<button class="btn-grade" style="margin-top: 8px; margin-right: 8px; padding: 5px 12px; font-size: 0.8rem; display: inline-block; flex: none; width: auto;" onclick="openGrading('${b.id}')"><i class="fas fa-edit"></i> ${b.batch} (${gradedCount} Graded)</button>`;
+                });
 
-            const vidData = { Title: title, VideoId: vidId, Folder: folder, Class: cls, Timestamp: Date.now() };
-
-            if (batch === "") {
-                let batchesForClass = new Set(allStudents.filter(s => s.Class === cls).map(s => s.Batch));
-                if(batchesForClass.size === 0) return alert(`No students found in Class ${cls}`);
-                let promises = Array.from(batchesForClass).map(b => db.collection("Videos").add({ ...vidData, Batch: b }));
-                Promise.all(promises).then(() => { alert("Video sent to all batches!"); document.getElementById('add-vid-modal').style.display='none'; });
-            } else {
-                if(!/^[A-Z]\d+$/.test(batch)) return alert("Invalid Batch format.");
-                db.collection("Videos").add({ ...vidData, Batch: batch }).then(() => { alert("Video Uploaded!"); document.getElementById('add-vid-modal').style.display='none'; });
-            }
+                container.innerHTML += `
+                    <div class="card" style="border-left-color: #f59e0b;">
+                        <div class="card-header">
+                            <h3 style="color: var(--primary-blue);">${exam.Title}</h3>
+                            <span class="badge" style="background: #fef3c7; color: #b45309;">Class ${exam.Class}</span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #555; margin-bottom: 5px;"><strong>Subject:</strong> ${exam.Subject} <br><i class="fas fa-calendar-day"></i> ${prettyDate}</p>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
+                            <strong style="font-size: 0.8rem; color: #888;">Grade Batches:</strong><br>
+                            ${batchButtons}
+                        </div>
+                    </div>`;
+            });
         }
 
         function renderVideosList() {
             const container = document.getElementById('videos-list-container'); container.innerHTML = '';
             if(allVideos.length === 0) return container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No videos uploaded.</div>`;
 
-            allVideos.forEach(vid => {
+            // Group duplicate videos based on Title, Class, and Folder
+            let groupedVideos = {};
+            allVideos.forEach(v => {
+                let key = `${v.Title}_${v.Class}_${v.Folder}`;
+                if(!groupedVideos[key]) groupedVideos[key] = { Title: v.Title, Class: v.Class, Folder: v.Folder, Timestamp: v.Timestamp, Docs: [], Batches: [] };
+                groupedVideos[key].Docs.push(v.id);
+                groupedVideos[key].Batches.push(v.Batch);
+            });
+
+            // Sort by Timestamp
+            Object.values(groupedVideos).sort((a,b) => b.Timestamp - a.Timestamp).forEach(vid => {
+                const docIdsString = JSON.stringify(vid.Docs).replace(/"/g, "'"); // format for inline onclick
+                
                 container.innerHTML += `
                     <div class="card" style="display:flex; justify-content:space-between; align-items:center; border-left-color: #ec4899;">
                         <div>
                             <h3 style="color:var(--primary-blue); font-size:1rem; margin-bottom:5px;">${vid.Title}</h3>
-                            <p style="font-size:0.8rem; color:#666;">📁 ${vid.Folder} &nbsp;|&nbsp; 🎓 ${vid.Class}-${vid.Batch}</p>
+                            <p style="font-size:0.8rem; color:#666;">📁 ${vid.Folder} &nbsp;|&nbsp; 🎓 Class ${vid.Class}</p>
+                            <p style="font-size:0.75rem; color:#888; margin-top:3px;"><strong>Assigned:</strong> ${vid.Batches.join(', ')}</p>
                         </div>
-                        <button onclick="deleteVideo('${vid.id}')" style="background:none; border:none; color:var(--danger); font-size:1.2rem; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                        <button onclick="deleteGroupedVideo(${docIdsString})" style="background:none; border:none; color:var(--danger); font-size:1.2rem; cursor:pointer;"><i class="fas fa-trash"></i></button>
                     </div>`;
             });
         }
 
-        function deleteVideo(id) { if(confirm("Delete this video?")) db.collection("Videos").doc(id).delete(); }
+        function deleteGroupedVideo(docIds) { 
+            if(confirm("Erase this video from ALL assigned batches?")) {
+                let batchDelete = db.batch();
+                docIds.forEach(id => batchDelete.delete(db.collection("Videos").doc(id)));
+                batchDelete.commit().then(() => alert("Video deleted successfully."));
+            } 
+        }
 
-        // --- PREVIOUS ADMIN FUNCTIONS ---
+        // =========================================================
+        // REMAINDER OF APP LOGIC (Preserved)
+        // =========================================================
+        function extractYTId(url) { let match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); return (match && match[2].length === 11) ? match[2] : null; }
+        function uploadVideo() { const title = document.getElementById('vid-title').value.trim(); const link = document.getElementById('vid-link').value.trim(); const folder = document.getElementById('vid-folder').value.trim(); const cls = document.getElementById('vid-class').value; let batch = document.getElementById('vid-batch').value.trim().toUpperCase(); if(!title || !link || !folder) return alert("Missing fields!"); let vidId = extractYTId(link); if(!vidId) return alert("Invalid YouTube link!"); const vidData = { Title: title, VideoId: vidId, Folder: folder, Class: cls, Timestamp: Date.now() }; if (batch === "") { let batchesForClass = new Set(allStudents.filter(s => s.Class === cls).map(s => s.Batch)); if(batchesForClass.size === 0) return alert(`No students in Class ${cls}`); let promises = Array.from(batchesForClass).map(b => db.collection("Videos").add({ ...vidData, Batch: b })); Promise.all(promises).then(() => { alert("Sent to all batches!"); document.getElementById('add-vid-modal').style.display='none'; }); } else { db.collection("Videos").add({ ...vidData, Batch: batch }).then(() => { alert("Uploaded!"); document.getElementById('add-vid-modal').style.display='none'; }); } }
+        
         function listenToAttendanceForDate() { if(attendanceListenerUnsubscribe) attendanceListenerUnsubscribe(); attendanceListenerUnsubscribe = db.collection("Attendance").where("date", "==", selectedDate).onSnapshot((snap) => { markedToday = {}; snap.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; }); if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList(); }); }
         function changeDate() { selectedDate = document.getElementById('view-date').value; listenToAttendanceForDate(); }
         function renderFolders() { const container = document.getElementById('folders-container'); container.innerHTML = ''; let grouped = {}; allStudents.forEach(s => { let c = s.Class || "Unk"; let b = s.Batch || "Unk"; if(!grouped[c]) grouped[c] = {}; if(!grouped[c][b]) grouped[c][b] = 0; grouped[c][b]++; }); ["8th", "9th", "10th", "Unk"].forEach(cls => { if(grouped[cls]) { let html = `<div class="class-group"><h3 class="class-title">Class ${cls}</h3><div class="folder-grid">`; Object.keys(grouped[cls]).sort().forEach(batch => { html += `<div class="folder-card" onclick="openBatchView('${cls}', '${batch}')"><i class="fas fa-folder"></i><h4>Batch ${batch}</h4><p>${grouped[cls][batch]} Students</p></div>`; }); container.innerHTML += html + `</div></div>`; } }); }
@@ -276,8 +308,7 @@
         function viewHistory(sId, sName) { document.getElementById('history-title').innerText = `${sName}'s History`; document.getElementById('history-modal').style.display='flex'; document.getElementById('history-list').innerHTML = "Loading..."; db.collection("Attendance").where("studentId","==",sId).get().then(snap => { if(snap.empty) return document.getElementById('history-list').innerHTML = "No records."; let recs = []; snap.forEach(d=>recs.push(d.data())); recs.sort((a,b)=>new Date(b.date)-new Date(a.date)); let pres = recs.filter(r=>r.status==='Present').length; let html = `<div><b>${Math.round((pres/recs.length)*100)}%</b> Overall</div>`; recs.forEach(r => html += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee;"><span>${r.date}</span><b>${r.status}</b></div>`); document.getElementById('history-list').innerHTML = html; }); }
         function closeHistoryModal() { document.getElementById('history-modal').style.display='none'; }
         function createNewExam() { const title = document.getElementById('ex-title').value.trim(); const subject = document.getElementById('ex-subject').value.trim(); const date = document.getElementById('ex-date').value; const cls = document.getElementById('ex-class').value; let batch = document.getElementById('ex-batch').value.trim().toUpperCase(); if(!title || !subject || !date) return alert("Required!"); if (batch === "") { let batchesForClass = new Set(allStudents.filter(s => s.Class === cls).map(s => s.Batch)); if(batchesForClass.size === 0) return alert(`No students in Class ${cls}`); let batchPromises = Array.from(batchesForClass).map(b => db.collection("Exams").add({ Title: title, Subject: subject, Date: date, Class: cls, Batch: b, Scores: {} })); Promise.all(batchPromises).then(() => { alert(`Success!`); document.getElementById('add-exam-modal').style.display='none'; }); } else { db.collection("Exams").add({ Title: title, Subject: subject, Date: date, Class: cls, Batch: batch, Scores: {} }).then(() => { alert("Scheduled!"); document.getElementById('add-exam-modal').style.display='none'; }); } }
-        function renderExamsList() { const container = document.getElementById('exams-list-container'); container.innerHTML = ''; if(allExams.length === 0) return container.innerHTML = `No exams yet.`; allExams.forEach(exam => { const dObj = new Date(exam.Date); const prettyDate = dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); const gradedCount = Object.keys(exam.Scores || {}).length; container.innerHTML += `<div class="card" style="border-left-color: #f59e0b;"><div class="card-header"><h3 style="color: var(--primary-blue);">${exam.Title}</h3><span class="badge" style="background: #fef3c7; color: #b45309;">${exam.Class} - ${exam.Batch}</span></div><p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;"><strong>Subject:</strong> ${exam.Subject} <br><i class="fas fa-calendar-day"></i> ${prettyDate}</p><div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 0.8rem; color: #888; font-weight: bold;">${gradedCount} Graded</span><button class="btn-grade" style="flex: none; padding: 6px 15px;" onclick="openGrading('${exam.id}')"><i class="fas fa-edit"></i> Marks</button></div></div>`; }); }
-        function openGrading(examId) { const exam = allExams.find(e => e.id === examId); if(!exam) return; currentGradingExamId = examId; document.getElementById('grade-title').innerText = exam.Title; document.getElementById('grade-sub').innerText = `${exam.Subject} | ${exam.Class} - ${exam.Batch}`; document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('grading-screen').classList.add('active'); const listContainer = document.getElementById('grading-list'); listContainer.innerHTML = ''; const studentsInExam = allStudents.filter(s => s.Class === exam.Class && s.Batch === exam.Batch); if(studentsInExam.length === 0) return listContainer.innerHTML = `No students found.`; studentsInExam.forEach(student => { const existingScore = (exam.Scores && exam.Scores[student.id]) ? exam.Scores[student.id] : ""; listContainer.innerHTML += `<div class="grade-item"><span style="font-weight: 600; color: #333;">${student.Name}</span><input type="text" class="grade-input" id="score-${student.id}" value="${existingScore}"></div>`; }); }
+        function openGrading(examId) { const exam = allExams.find(e => e.id === examId); if(!exam) return; currentGradingExamId = examId; document.getElementById('grade-title').innerText = exam.Title; document.getElementById('grade-sub').innerText = `${exam.Subject} | Class ${exam.Class} - Batch ${exam.Batch}`; document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('grading-screen').classList.add('active'); const listContainer = document.getElementById('grading-list'); listContainer.innerHTML = ''; const studentsInExam = allStudents.filter(s => s.Class === exam.Class && s.Batch === exam.Batch); if(studentsInExam.length === 0) return listContainer.innerHTML = `No students found.`; studentsInExam.forEach(student => { const existingScore = (exam.Scores && exam.Scores[student.id]) ? exam.Scores[student.id] : ""; listContainer.innerHTML += `<div class="grade-item"><span style="font-weight: 600; color: #333;">${student.Name}</span><input type="text" class="grade-input" id="score-${student.id}" value="${existingScore}"></div>`; }); }
         function saveGrading() { const exam = allExams.find(e => e.id === currentGradingExamId); const studentsInExam = allStudents.filter(s => s.Class === exam.Class && s.Batch === exam.Batch); let newScores = {}; studentsInExam.forEach(student => { const inputVal = document.getElementById(`score-${student.id}`).value.trim(); if (inputVal !== "") newScores[student.id] = inputVal; }); db.collection("Exams").doc(currentGradingExamId).update({ Scores: newScores }).then(() => { alert("Marks Saved!"); switchTab('exams'); }); }
         function deleteExam() { if(confirm(`⚠️ Delete Exam completely?`)) { let pwd = prompt(`Password:`); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(() => db.collection("Exams").doc(currentGradingExamId).delete().then(() => switchTab('exams'))).catch(() => alert("❌ Wrong Password.")); } }
     </script>
