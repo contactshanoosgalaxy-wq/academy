@@ -186,36 +186,39 @@
     <section class="section" id="admission">
         <h2 class="section-title">Student Registration</h2>
         <div class="form-container">
-            <form id="studentDataForm" onsubmit="event.preventDefault(); alert('Form design is ready! Database connection coming soon.');">
+             <form id="studentDataForm" action="YOUR_GOOGLE_FORM_RESPONSE_URL_HERE" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
                 
-                <div class="form-row">
-                    <div class="form-group"><input type="text" class="form-control" placeholder="Student Full Name" required></div>
-                    <div class="form-group"><input type="tel" class="form-control" placeholder="Phone Number" required></div>
-                </div>
+    <div class="form-row">
+        <div class="form-group"><input type="text" name="entry.111111111" class="form-control" placeholder="Student Full Name" required></div>
+        <div class="form-group"><input type="tel" name="entry.222222222" class="form-control" placeholder="Phone Number" required></div>
+    </div>
 
-                <div class="form-row">
-                    <div class="form-group"><input type="text" class="form-control" placeholder="School Name" required></div>
-                    <div class="form-group">
-                        <select class="form-control" required>
-                            <option value="" disabled selected>Select Class</option>
-                            <option value="8">Class 8</option>
-                            <option value="9">Class 9</option>
-                            <option value="10">Class 10</option>
-                        </select>
-                    </div>
-                </div>
+    <div class="form-row">
+        <div class="form-group"><input type="text" name="entry.333333333" class="form-control" placeholder="School Name" required></div>
+        <div class="form-group">
+            <select name="entry.444444444" class="form-control" required>
+                <option value="" disabled selected>Select Class</option>
+                <option value="8">Class 8</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+            </select>
+        </div>
+    </div>
 
-                <div class="form-group">
-                    <select class="form-control" required>
-                        <option value="" disabled selected>Select Preferred Branch</option>
-                        <option value="Chakkalakal">Chakkalakal</option>
-                        <option value="Narikkuni">Narikkuni</option>
-                        <option value="Mariveettil Thazham">Mariveettil Thazham</option>
-                    </select>
-                </div>
+    <div class="form-group">
+        <select name="entry.555555555" class="form-control" required>
+            <option value="" disabled selected>Select Preferred Branch</option>
+            <option value="Chakkalakal">Chakkalakal</option>
+            <option value="Narikkuni">Narikkuni</option>
+            <option value="Mariveettil Thazham">Mariveettil Thazham</option>
+        </select>
+    </div>
 
-                <button type="submit" class="submit-btn">Submit Details</button>
-            </form>
+    <button type="submit" class="submit-btn">Submit Details</button>
+</form>
+
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location='thank-you.html';}"></iframe>
+<script>var submitted=false;</script>
         </div>
     </section>
 
