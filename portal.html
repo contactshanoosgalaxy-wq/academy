@@ -5,32 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Portal | Academy Madavoor</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        
         :root { --primary-blue: #003b8e; --light-blue: #0056d6; --bg-color: #f4f7f6; --white: #ffffff; --text-dark: #1a2a3a; --danger: #ef4444; --success: #10b981; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; }
-
         #app-container { width: 100%; max-width: 450px; min-height: 100vh; background: var(--bg-color); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding-bottom: 80px; }
         header { background: var(--primary-blue); color: var(--white); padding: 20px; text-align: center; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 10px rgba(0,59,142,0.2); position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;}
         #logout-btn { display: none; background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
-
         .screen { padding: 20px; display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease; }
-
-        /* Login */
+        
+        /* Form & Cards */
         .login-box { background: var(--white); padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-top: 50px; }
         .login-box h2 { text-align: center; margin-bottom: 20px; color: var(--primary-blue); }
         .form-control { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
         .btn { width: 100%; padding: 15px; background: var(--primary-blue); color: var(--white); border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s;}
+        .card { background: var(--white); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 4px solid var(--primary-blue); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+        .badge { background: #e2e8f0; color: #555; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: 700; }
+        .form-row { display: flex; gap: 10px; }
         
-        /* Dashboard & Folders */
+        /* Dashboard & Batches */
         .greeting { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; }
         .class-group { margin-bottom: 25px; }
         .class-title { font-size: 1.1rem; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
@@ -38,76 +38,47 @@
         .folder-card { background: var(--white); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .folder-card:hover { border-color: var(--primary-blue); transform: translateY(-3px); }
         .folder-card i { font-size: 2rem; color: var(--light-blue); margin-bottom: 10px; }
-        .folder-card h4 { color: var(--text-dark); font-size: 1.1rem; }
-        .folder-card p { font-size: 0.8rem; color: #888; margin-top: 5px; }
-
-        /* Batch View Header */
+        
+        /* Specific elements */
         .batch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .back-btn { background: #e2e8f0; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; }
-        
-        /* Date Picker Box */
         .date-picker-box { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 4px solid var(--primary-blue); }
         .date-picker-box input { border: 1px solid #ccc; padding: 6px 10px; border-radius: 6px; font-family: inherit; font-weight: 600; color: var(--primary-blue); outline: none; }
-
         .tab-toggles { display: flex; background: #e2e8f0; border-radius: 8px; padding: 4px; margin-bottom: 20px;}
         .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 6px; font-weight: 600; cursor: pointer; color: #555;}
         .tab-btn.active { background: var(--white); color: var(--primary-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
-        /* Cards */
-        .card { background: var(--white); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 4px solid var(--primary-blue); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
-        .card h3 { font-size: 1.1rem; color: var(--text-dark); }
-        .badge { background: #e2e8f0; color: #555; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: 700; }
-        
-        /* Directory Specific */
         .search-bar { display: flex; background: white; border-radius: 8px; padding: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ddd;}
         .search-bar input { border: none; outline: none; padding: 10px; flex: 1; font-size: 1rem; }
-        .search-bar i { padding: 12px; color: #888; }
         .dir-actions { display: flex; gap: 10px; margin-top: 10px; }
         .btn-edit, .btn-grade { background: #fef08a; color: #854d0e; border: none; padding: 8px; border-radius: 6px; flex: 1; font-weight: 600; cursor: pointer; }
         .btn-grade { background: #e0f2fe; color: #0369a1; }
         .btn-del { background: #fecaca; color: #991b1b; border: none; padding: 8px; border-radius: 6px; flex: 1; font-weight: 600; cursor: pointer; }
-
-        /* Attendance Elements */
+        
         .action-btns { display: flex; gap: 10px; margin-bottom: 8px;}
         .btn-present, .btn-absent { border: none; padding: 10px 15px; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; flex: 1; }
-        .btn-present { background-color: var(--success); }
-        .btn-absent { background-color: var(--danger); }
+        .btn-present { background-color: var(--success); } .btn-absent { background-color: var(--danger); }
         .status-tag { font-size: 0.8rem; padding: 5px 10px; border-radius: 20px; font-weight: 600; display: inline-block; text-align: center; width: 100%; margin-bottom: 8px;}
-        .tag-present { background: #d1fae5; color: #065f46; }
-        .tag-absent { background: #fee2e2; color: #991b1b; }
-        
+        .tag-present { background: #d1fae5; color: #065f46; } .tag-absent { background: #fee2e2; color: #991b1b; }
         .btn-history { width: 100%; background: #e2e8f0; color: #333; border: none; padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.85rem;}
-
-        /* Fees Elements */
+        
         .fee-stats { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 15px; }
-        .fee-stats div { text-align: center; }
-        .fee-val { font-weight: 700; font-size: 1.1rem; display: block; }
-        .text-danger { color: var(--danger); }
-        .text-success { color: var(--success); }
+        .fee-stats div { text-align: center; } .fee-val { font-weight: 700; font-size: 1.1rem; display: block; }
+        .text-danger { color: var(--danger); } .text-success { color: var(--success); }
         .btn-pay { width: 100%; background: var(--bg-color); color: var(--primary-blue); border: 2px solid var(--primary-blue); padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;}
-
-        /* Admin Form */
-        .admin-form { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .admin-form label { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 5px; display: block;}
-        .form-row { display: flex; gap: 10px; }
-
+        
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto;}
         .modal-close { float: right; cursor: pointer; font-size: 1.2rem; color: #888; }
-        
-        /* Grading specific */
         .grade-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f0f0f0; }
         .grade-input { width: 80px; padding: 6px; border: 1px solid #ccc; border-radius: 6px; text-align: center; font-weight: bold; color: var(--primary-blue);}
 
-        /* Bottom Nav - Updated to 4 Tabs (25% width) */
+        /* Bottom Nav - 5 Tabs (20% width) */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: var(--white); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: none; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 20; }
-        .nav-item { text-align: center; color: #888; cursor: pointer; transition: 0.3s; width: 25%;}
+        .nav-item { text-align: center; color: #888; cursor: pointer; transition: 0.3s; width: 20%;}
         .nav-item i { font-size: 1.3rem; display: block; margin-bottom: 5px; }
-        .nav-item span { font-size: 0.7rem; font-weight: 600; }
+        .nav-item span { font-size: 0.65rem; font-weight: 600; }
         .nav-item.active { color: var(--primary-blue); }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -120,449 +91,195 @@
         </header>
 
         <div id="login-screen" class="screen active">
-            <div class="login-box">
-                <h2>Staff Login</h2>
-                <input type="email" id="email" class="form-control" placeholder="Email Address">
-                <input type="password" id="password" class="form-control" placeholder="Password">
-                <button class="btn" onclick="login()">Login</button>
-                <p id="error-msg" style="color: red; text-align: center; margin-top: 10px; font-size: 0.9rem;"></p>
-            </div>
+            <div class="login-box"><h2>Staff Login</h2><input type="email" id="email" class="form-control" placeholder="Email"><input type="password" id="password" class="form-control" placeholder="Password"><button class="btn" onclick="login()">Login</button><p id="error-msg" style="color: red; text-align: center; margin-top: 10px; font-size: 0.9rem;"></p></div>
         </div>
 
-        <div id="dashboard-screen" class="screen">
-            <div class="greeting" id="admin-greeting">Hey, Admin! 👋</div>
-            <div id="folders-container">
-                <div style="text-align: center; color: #888; padding: 20px;">Loading batches...</div>
-            </div>
-        </div>
+        <div id="dashboard-screen" class="screen"><div class="greeting" id="admin-greeting">Hey, Admin! 👋</div><div id="folders-container">Loading batches...</div></div>
 
         <div id="batch-screen" class="screen">
-            <div class="batch-header">
-                <button class="back-btn" onclick="switchTab('dashboard')"><i class="fas fa-arrow-left"></i> Back</button>
-                <h2 id="current-batch-title" style="font-size: 1.2rem; color: var(--primary-blue); margin: 0 10px;">Class - Batch</h2>
-                <button onclick="deleteCurrentBatch()" style="background: none; border: none; color: var(--danger); font-size: 1.3rem; cursor: pointer;" title="Delete Batch"><i class="fas fa-trash-alt"></i></button>
-            </div>
-            
-            <div class="date-picker-box" id="attendance-date-box">
-                <span style="font-weight: 600; color: #555; font-size: 0.9rem;"><i class="fas fa-calendar-day"></i> View Date:</span>
-                <input type="date" id="view-date" onchange="changeDate()">
-            </div>
-            
-            <div class="tab-toggles">
-                <button class="tab-btn active" id="btn-att" onclick="toggleBatchMode('attendance')">Attendance</button>
-                <button class="tab-btn" id="btn-fee" onclick="toggleBatchMode('fees')">Fees</button>
-            </div>
-
+            <div class="batch-header"><button class="back-btn" onclick="switchTab('dashboard')"><i class="fas fa-arrow-left"></i> Back</button><h2 id="current-batch-title" style="font-size: 1.2rem; color: var(--primary-blue); margin: 0 10px;">Class - Batch</h2><button onclick="deleteCurrentBatch()" style="background:none;border:none;color:var(--danger);font-size:1.3rem;cursor:pointer;"><i class="fas fa-trash-alt"></i></button></div>
+            <div class="date-picker-box" id="attendance-date-box"><span style="font-weight: 600; color: #555; font-size: 0.9rem;"><i class="fas fa-calendar-day"></i> View Date:</span><input type="date" id="view-date" onchange="changeDate()"></div>
+            <div class="tab-toggles"><button class="tab-btn active" id="btn-att" onclick="toggleBatchMode('attendance')">Attendance</button><button class="tab-btn" id="btn-fee" onclick="toggleBatchMode('fees')">Fees</button></div>
             <div id="batch-list-container"></div>
         </div>
 
-        <div id="directory-screen" class="screen">
-            <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-address-book"></i> Student Directory</h2>
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" id="search-input" placeholder="Search by name or phone..." onkeyup="renderDirectory()">
-            </div>
-            <div id="directory-list"></div>
-        </div>
+        <div id="directory-screen" class="screen"><h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-address-book"></i> Student Directory</h2><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="search-input" placeholder="Search by name or phone..." onkeyup="renderDirectory()"></div><div id="directory-list"></div></div>
 
         <div id="exams-screen" class="screen">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 style="font-size: 1.2rem; color: var(--primary-blue);"><i class="fas fa-file-alt"></i> Exams Hub</h2>
-                <button onclick="document.getElementById('add-exam-modal').style.display='flex'" style="background: var(--primary-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;"><i class="fas fa-plus"></i> New Exam</button>
-            </div>
-            <div id="exams-list-container">
-                <div style="text-align: center; color: #888; padding: 20px;">Loading exams...</div>
-            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h2 style="font-size: 1.2rem; color: var(--primary-blue);"><i class="fas fa-file-alt"></i> Exams Hub</h2><button onclick="document.getElementById('add-exam-modal').style.display='flex'" style="background: var(--primary-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;"><i class="fas fa-plus"></i> New</button></div>
+            <div id="exams-list-container">Loading exams...</div>
         </div>
 
         <div id="grading-screen" class="screen">
-            <div class="batch-header">
-                <button class="back-btn" onclick="switchTab('exams')"><i class="fas fa-arrow-left"></i> Back</button>
-                <button onclick="deleteExam()" style="background: none; border: none; color: var(--danger); font-size: 1.3rem; cursor: pointer;" title="Delete Exam"><i class="fas fa-trash-alt"></i></button>
+            <div class="batch-header"><button class="back-btn" onclick="switchTab('exams')"><i class="fas fa-arrow-left"></i> Back</button><button onclick="deleteExam()" style="background:none;border:none;color:var(--danger);font-size:1.3rem;cursor:pointer;"><i class="fas fa-trash-alt"></i></button></div>
+            <div style="text-align: center; margin-bottom: 20px;"><h2 id="grade-title" style="color: var(--primary-blue);">Title</h2><p id="grade-sub" style="color: #666; font-size: 0.9rem; font-weight: 600;">Sub</p></div>
+            <div class="card" style="padding: 0;" id="grading-list"></div><button class="btn" onclick="saveGrading()"><i class="fas fa-save"></i> Save All Marks</button>
+        </div>
+
+        <div id="videos-screen" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="font-size: 1.2rem; color: var(--primary-blue);"><i class="fas fa-video"></i> Video Hub</h2>
+                <button onclick="document.getElementById('add-vid-modal').style.display='flex'" style="background: var(--primary-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;"><i class="fas fa-upload"></i> Upload</button>
             </div>
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h2 id="grade-title" style="color: var(--primary-blue); font-size: 1.4rem;">Weekly Test</h2>
-                <p id="grade-sub" style="color: #666; font-size: 0.9rem; font-weight: 600;">Physics | 9th - A1</p>
-            </div>
-            
-            <div class="card" style="padding: 0;" id="grading-list">
-                </div>
-            <button class="btn" onclick="saveGrading()"><i class="fas fa-save"></i> Save All Marks</button>
+            <div id="videos-list-container">Loading videos...</div>
         </div>
 
         <div id="add-screen" class="screen">
             <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-user-plus"></i> Add Admission</h2>
             <div class="admin-form">
-                <label>Student Name</label>
-                <input type="text" id="new-name" class="form-control" placeholder="Full Name">
-                <label>WhatsApp Number</label>
-                <input type="tel" id="new-phone" class="form-control" placeholder="10-digit number">
-                
-                <div class="form-row">
-                    <div style="flex: 1;"><label>Class</label><select id="new-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div>
-                    <div style="flex: 1;"><label>Batch</label><input type="text" id="new-batch" class="form-control" placeholder="e.g. A1, B2" maxlength="3"></div>
-                </div>
-
-                <div class="form-row">
-                    <div style="flex: 1;"><label>Total Fee</label><input type="number" id="new-total" class="form-control" value="5000"></div>
-                    <div style="flex: 1;"><label>Advance</label><input type="number" id="new-paid" class="form-control" value="0"></div>
-                </div>
-                <button class="btn" onclick="addNewStudent()" style="margin-top: 10px;"><i class="fas fa-save"></i> Save Student</button>
+                <input type="text" id="new-name" class="form-control" placeholder="Full Name"><input type="tel" id="new-phone" class="form-control" placeholder="10-digit number">
+                <div class="form-row"><div style="flex: 1;"><select id="new-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><input type="text" id="new-batch" class="form-control" placeholder="Batch (e.g. A1)" maxlength="3"></div></div>
+                <div class="form-row"><div style="flex: 1;"><input type="number" id="new-total" class="form-control" placeholder="Total Fee"></div><div style="flex: 1;"><input type="number" id="new-paid" class="form-control" placeholder="Paid"></div></div>
+                <button class="btn" onclick="addNewStudent()"><i class="fas fa-save"></i> Save Student</button>
             </div>
         </div>
 
-        <div id="add-exam-modal" class="modal-overlay">
-            <div class="modal-content">
-                <i class="fas fa-times modal-close" onclick="document.getElementById('add-exam-modal').style.display='none'"></i>
-                <h3 style="margin-bottom: 15px; color: var(--primary-blue);">Schedule Exam</h3>
-                
-                <label style="font-size: 0.8rem; font-weight: 600;">Exam Title</label>
-                <input type="text" id="ex-title" class="form-control" placeholder="e.g. Weekly Test, Half-Yearly">
-                
-                <label style="font-size: 0.8rem; font-weight: 600;">Subject</label>
-                <input type="text" id="ex-subject" class="form-control" placeholder="e.g. Mathematics, Physics">
-                
-                <label style="font-size: 0.8rem; font-weight: 600;">Date</label>
-                <input type="date" id="ex-date" class="form-control">
-                
+        <div id="add-exam-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="document.getElementById('add-exam-modal').style.display='none'"></i><h3 style="margin-bottom: 15px; color: var(--primary-blue);">Schedule Exam</h3>
+            <input type="text" id="ex-title" class="form-control" placeholder="Exam Title"><input type="text" id="ex-subject" class="form-control" placeholder="Subject"><input type="date" id="ex-date" class="form-control">
+            <div class="form-row"><div style="flex: 1;"><select id="ex-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><input type="text" id="ex-batch" class="form-control" placeholder="Batch (Blank for ALL)"></div></div>
+            <button class="btn" onclick="createNewExam()"><i class="fas fa-plus-circle"></i> Create</button></div>
+        </div>
+
+        <div id="add-vid-modal" class="modal-overlay">
+            <div class="modal-content"><i class="fas fa-times modal-close" onclick="document.getElementById('add-vid-modal').style.display='none'"></i>
+                <h3 style="margin-bottom: 15px; color: var(--primary-blue);">Upload Video</h3>
+                <label style="font-size:0.8rem; font-weight:600;">Video Title</label>
+                <input type="text" id="vid-title" class="form-control" placeholder="e.g. Chapter 1: Motion">
+                <label style="font-size:0.8rem; font-weight:600;">YouTube Link (Unlisted/Public)</label>
+                <input type="text" id="vid-link" class="form-control" placeholder="https://youtu.be/...">
+                <label style="font-size:0.8rem; font-weight:600;">Folder / Subject Name</label>
+                <input type="text" id="vid-folder" class="form-control" placeholder="e.g. Physics">
                 <div class="form-row">
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.8rem; font-weight: 600;">Target Class</label>
-                        <select id="ex-class" class="form-control">
-                            <option value="8th">8th</option>
-                            <option value="9th">9th</option>
-                            <option value="10th">10th</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.8rem; font-weight: 600;">Target Batch</label>
-                        <input type="text" id="ex-batch" class="form-control" placeholder="Leave blank for ALL">
-                    </div>
+                    <div style="flex: 1;"><label style="font-size:0.8rem; font-weight:600;">Target Class</label><select id="vid-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div>
+                    <div style="flex: 1;"><label style="font-size:0.8rem; font-weight:600;">Target Batch</label><input type="text" id="vid-batch" class="form-control" placeholder="Leave blank for ALL"></div>
                 </div>
-                <p style="font-size: 0.75rem; color: #888; margin-top: -5px; margin-bottom: 15px;">*If you leave Batch blank, an exam will be created for every active batch in that class.</p>
-                
-                <button class="btn" onclick="createNewExam()"><i class="fas fa-plus-circle"></i> Create Exam</button>
+                <button class="btn" onclick="uploadVideo()"><i class="fas fa-upload"></i> Publish Video</button>
             </div>
         </div>
 
-        <div id="edit-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="closeEditModal()"></i><h3 style="margin-bottom: 15px; color: var(--primary-blue);">Edit Student</h3><input type="hidden" id="edit-id"><label style="font-size: 0.8rem; font-weight: 600;">Name</label><input type="text" id="edit-name" class="form-control"><label style="font-size: 0.8rem; font-weight: 600;">Phone</label><input type="text" id="edit-phone" class="form-control"><div class="form-row"><div style="flex: 1;"><label style="font-size: 0.8rem; font-weight: 600;">Class</label><select id="edit-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><label style="font-size: 0.8rem; font-weight: 600;">Batch</label><input type="text" id="edit-batch" class="form-control" maxlength="3"></div></div><div class="form-row"><div style="flex: 1;"><label style="font-size: 0.8rem; font-weight: 600;">Total Fee</label><input type="number" id="edit-total" class="form-control"></div><div style="flex: 1;"><label style="font-size: 0.8rem; font-weight: 600;">Paid Fee</label><input type="number" id="edit-paid" class="form-control"></div></div><button class="btn" onclick="saveEdit()"><i class="fas fa-save"></i> Update Details</button></div></div>
+        <div id="edit-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="closeEditModal()"></i><h3 style="margin-bottom: 15px; color: var(--primary-blue);">Edit</h3><input type="hidden" id="edit-id"><input type="text" id="edit-name" class="form-control"><input type="text" id="edit-phone" class="form-control"><div class="form-row"><div style="flex: 1;"><select id="edit-class" class="form-control"><option value="8th">8th</option><option value="9th">9th</option><option value="10th">10th</option></select></div><div style="flex: 1;"><input type="text" id="edit-batch" class="form-control" maxlength="3"></div></div><div class="form-row"><div style="flex: 1;"><input type="number" id="edit-total" class="form-control"></div><div style="flex: 1;"><input type="number" id="edit-paid" class="form-control"></div></div><button class="btn" onclick="saveEdit()"><i class="fas fa-save"></i> Save</button></div></div>
         <div id="history-modal" class="modal-overlay"><div class="modal-content"><i class="fas fa-times modal-close" onclick="closeHistoryModal()"></i><h3 id="history-title" style="margin-bottom: 15px; color: var(--primary-blue);">History</h3><div id="history-list"></div></div></div>
 
         <nav class="bottom-nav" id="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i><span>Dashboard</span></div>
-            <div class="nav-item" onclick="switchTab('directory')"><i class="fas fa-users"></i><span>Directory</span></div>
+            <div class="nav-item active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i><span>Home</span></div>
+            <div class="nav-item" onclick="switchTab('directory')"><i class="fas fa-users"></i><span>Students</span></div>
             <div class="nav-item" onclick="switchTab('exams')"><i class="fas fa-pen-alt"></i><span>Exams</span></div>
-            <div class="nav-item" onclick="switchTab('add')"><i class="fas fa-user-plus"></i><span>New Admit</span></div>
+            <div class="nav-item" onclick="switchTab('videos')"><i class="fas fa-video"></i><span>Videos</span></div>
+            <div class="nav-item" onclick="switchTab('add')"><i class="fas fa-user-plus"></i><span>Admit</span></div>
         </nav>
     </div>
 
     <script>
-        // =========================================================
-        // FIREBASE CONFIGURATION
-        // =========================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyDNo7xIyzmcAhOjjnjB5JF2eTiIXY5kfJg",
-            authDomain: "academy-madavoor-portal.firebaseapp.com",
-            projectId: "academy-madavoor-portal",
-            storageBucket: "academy-madavoor-portal.firebasestorage.app",
-            messagingSenderId: "883093460593",
-            appId: "1:883093460593:web:489d90f93fa78eb3e1add0"
-        };
-        
+        const firebaseConfig = { apiKey: "AIzaSyDNo7xIyzmcAhOjjnjB5JF2eTiIXY5kfJg", authDomain: "academy-madavoor-portal.firebaseapp.com", projectId: "academy-madavoor-portal", storageBucket: "academy-madavoor-portal.firebasestorage.app", messagingSenderId: "883093460593", appId: "1:883093460593:web:489d90f93fa78eb3e1add0" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        const auth = firebase.auth(); const db = firebase.firestore();
 
-        // Global State Variables
-        let allStudents = [];
-        let allExams = [];
-        let markedToday = {};
-        let currentViewClass = '';
-        let currentViewBatch = '';
-        let currentBatchMode = 'attendance';
-        let currentGradingExamId = '';
-        
-        let selectedDate = new Date().toISOString().split('T')[0];
-        let attendanceListenerUnsubscribe = null;
+        let allStudents = []; let allExams = []; let allVideos = []; let markedToday = {};
+        let currentViewClass = ''; let currentViewBatch = ''; let currentBatchMode = 'attendance'; let currentGradingExamId = '';
+        let selectedDate = new Date().toISOString().split('T')[0]; let attendanceListenerUnsubscribe = null;
         document.getElementById('view-date').value = selectedDate;
 
         auth.onAuthStateChanged(user => {
             if (user) {
-                let adminName = user.email.split('@')[0];
-                document.getElementById('admin-greeting').innerText = `Hey, ${adminName.charAt(0).toUpperCase() + adminName.slice(1)}! 👋`;
-
-                document.getElementById('login-screen').classList.remove('active');
-                document.getElementById('bottom-nav').style.display = 'flex';
-                document.getElementById('logout-btn').style.display = 'block';
-                
-                switchTab('dashboard');
-                initRealtimeDataSync(); 
-                listenToAttendanceForDate(); 
+                document.getElementById('admin-greeting').innerText = `Hey, ${user.email.split('@')[0]}!`;
+                document.getElementById('login-screen').classList.remove('active'); document.getElementById('bottom-nav').style.display = 'flex'; document.getElementById('logout-btn').style.display = 'block';
+                switchTab('dashboard'); initRealtimeDataSync(); listenToAttendanceForDate(); 
             } else {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById('login-screen').classList.add('active');
-                document.getElementById('bottom-nav').style.display = 'none';
-                document.getElementById('logout-btn').style.display = 'none';
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('login-screen').classList.add('active'); document.getElementById('bottom-nav').style.display = 'none'; document.getElementById('logout-btn').style.display = 'none';
             }
         });
 
-        function login() {
-            auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value)
-                .catch(err => document.getElementById('error-msg').innerText = "Error: " + err.message);
-        }
+        function login() { auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value).catch(err => document.getElementById('error-msg').innerText = "Error: " + err.message); }
         document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
         function switchTab(tab) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`${tab}-screen`).classList.add('active');
-            
             if(tab === 'dashboard') { document.querySelectorAll('.nav-item')[0].classList.add('active'); renderFolders(); }
             if(tab === 'directory') { document.querySelectorAll('.nav-item')[1].classList.add('active'); renderDirectory(); }
             if(tab === 'exams') { document.querySelectorAll('.nav-item')[2].classList.add('active'); renderExamsList(); }
-            if(tab === 'add') { document.querySelectorAll('.nav-item')[3].classList.add('active'); }
+            if(tab === 'videos') { document.querySelectorAll('.nav-item')[3].classList.add('active'); renderVideosList(); }
+            if(tab === 'add') { document.querySelectorAll('.nav-item')[4].classList.add('active'); }
         }
 
         function initRealtimeDataSync() {
-            db.collection("Students").onSnapshot((snapshot) => {
-                allStudents = [];
-                snapshot.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() }));
-                allStudents.sort((a, b) => a.Name.localeCompare(b.Name));
-                if(document.getElementById('dashboard-screen').classList.contains('active')) renderFolders();
-                if(document.getElementById('directory-screen').classList.contains('active')) renderDirectory();
-                if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
-            });
-
-            // NEW: Listen for Exams
-            db.collection("Exams").onSnapshot((snapshot) => {
-                allExams = [];
-                snapshot.forEach(doc => allExams.push({ id: doc.id, ...doc.data() }));
-                // Sort by date (newest first)
-                allExams.sort((a, b) => new Date(b.Date) - new Date(a.Date));
-                if(document.getElementById('exams-screen').classList.contains('active')) renderExamsList();
-            });
+            db.collection("Students").onSnapshot((snap) => { allStudents = []; snap.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() })); allStudents.sort((a,b)=>a.Name.localeCompare(b.Name)); if(document.getElementById('dashboard-screen').classList.contains('active')) renderFolders(); if(document.getElementById('directory-screen').classList.contains('active')) renderDirectory(); if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList(); });
+            db.collection("Exams").onSnapshot((snap) => { allExams = []; snap.forEach(doc => allExams.push({ id: doc.id, ...doc.data() })); allExams.sort((a,b)=>new Date(b.Date)-new Date(a.Date)); if(document.getElementById('exams-screen').classList.contains('active')) renderExamsList(); });
+            // Sync Videos
+            db.collection("Videos").onSnapshot((snap) => { allVideos = []; snap.forEach(doc => allVideos.push({ id: doc.id, ...doc.data() })); allVideos.sort((a,b)=>b.Timestamp - a.Timestamp); if(document.getElementById('videos-screen').classList.contains('active')) renderVideosList(); });
         }
 
-        // =========================================================
-        // EXAMS MODULE LOGIC (NEW)
-        // =========================================================
-        function createNewExam() {
-            const title = document.getElementById('ex-title').value.trim();
-            const subject = document.getElementById('ex-subject').value.trim();
-            const date = document.getElementById('ex-date').value;
-            const cls = document.getElementById('ex-class').value;
-            let batch = document.getElementById('ex-batch').value.trim().toUpperCase();
+        // --- VIDEOS LOGIC ---
+        function extractYTId(url) {
+            let match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
 
-            if(!title || !subject || !date) return alert("Title, Subject, and Date are required!");
+        function uploadVideo() {
+            const title = document.getElementById('vid-title').value.trim();
+            const link = document.getElementById('vid-link').value.trim();
+            const folder = document.getElementById('vid-folder').value.trim();
+            const cls = document.getElementById('vid-class').value;
+            let batch = document.getElementById('vid-batch').value.trim().toUpperCase();
+
+            if(!title || !link || !folder) return alert("Title, Link, and Folder are required!");
+            let vidId = extractYTId(link);
+            if(!vidId) return alert("Invalid YouTube link!");
+
+            const vidData = { Title: title, VideoId: vidId, Folder: folder, Class: cls, Timestamp: Date.now() };
 
             if (batch === "") {
-                // THE STARTUP HACK: Scan DB for all unique batches in this class and create exams for all of them!
                 let batchesForClass = new Set(allStudents.filter(s => s.Class === cls).map(s => s.Batch));
-                if(batchesForClass.size === 0) return alert(`No students found in Class ${cls} yet.`);
-
-                let batchPromises = Array.from(batchesForClass).map(b => {
-                    return db.collection("Exams").add({ Title: title, Subject: subject, Date: date, Class: cls, Batch: b, Scores: {} });
-                });
-
-                Promise.all(batchPromises).then(() => {
-                    alert(`Success! Exam scheduled for all ${batchesForClass.size} batches in Class ${cls}.`);
-                    document.getElementById('add-exam-modal').style.display='none';
-                });
+                if(batchesForClass.size === 0) return alert(`No students found in Class ${cls}`);
+                let promises = Array.from(batchesForClass).map(b => db.collection("Videos").add({ ...vidData, Batch: b }));
+                Promise.all(promises).then(() => { alert("Video sent to all batches!"); document.getElementById('add-vid-modal').style.display='none'; });
             } else {
-                // Standard Single Batch Create
-                if(!/^[A-Z]\d+$/.test(batch)) return alert("Invalid Batch format! Use a letter and number (e.g., A1).");
-                db.collection("Exams").add({ Title: title, Subject: subject, Date: date, Class: cls, Batch: batch, Scores: {} })
-                  .then(() => { alert("Exam Scheduled!"); document.getElementById('add-exam-modal').style.display='none'; });
+                if(!/^[A-Z]\d+$/.test(batch)) return alert("Invalid Batch format.");
+                db.collection("Videos").add({ ...vidData, Batch: batch }).then(() => { alert("Video Uploaded!"); document.getElementById('add-vid-modal').style.display='none'; });
             }
         }
 
-        function renderExamsList() {
-            const container = document.getElementById('exams-list-container');
-            container.innerHTML = '';
-            
-            if(allExams.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No exams scheduled yet.</div>`;
-                return;
-            }
+        function renderVideosList() {
+            const container = document.getElementById('videos-list-container'); container.innerHTML = '';
+            if(allVideos.length === 0) return container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No videos uploaded.</div>`;
 
-            allExams.forEach(exam => {
-                // Formatting Date
-                const dObj = new Date(exam.Date);
-                const prettyDate = dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-                
-                // Count graded students
-                const gradedCount = Object.keys(exam.Scores || {}).length;
-                
+            allVideos.forEach(vid => {
                 container.innerHTML += `
-                    <div class="card" style="border-left-color: #f59e0b;">
-                        <div class="card-header">
-                            <h3 style="color: var(--primary-blue);">${exam.Title}</h3>
-                            <span class="badge" style="background: #fef3c7; color: #b45309;">${exam.Class} - ${exam.Batch}</span>
+                    <div class="card" style="display:flex; justify-content:space-between; align-items:center; border-left-color: #ec4899;">
+                        <div>
+                            <h3 style="color:var(--primary-blue); font-size:1rem; margin-bottom:5px;">${vid.Title}</h3>
+                            <p style="font-size:0.8rem; color:#666;">📁 ${vid.Folder} &nbsp;|&nbsp; 🎓 ${vid.Class}-${vid.Batch}</p>
                         </div>
-                        <p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;"><strong>Subject:</strong> ${exam.Subject} <br><i class="fas fa-calendar-day"></i> ${prettyDate}</p>
-                        
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.8rem; color: #888; font-weight: bold;">${gradedCount} Students Graded</span>
-                            <button class="btn-grade" style="flex: none; padding: 6px 15px;" onclick="openGrading('${exam.id}')"><i class="fas fa-edit"></i> Enter Marks</button>
-                        </div>
-                    </div>
-                `;
+                        <button onclick="deleteVideo('${vid.id}')" style="background:none; border:none; color:var(--danger); font-size:1.2rem; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    </div>`;
             });
         }
 
-        function openGrading(examId) {
-            const exam = allExams.find(e => e.id === examId);
-            if(!exam) return;
-            
-            currentGradingExamId = examId;
-            document.getElementById('grade-title').innerText = exam.Title;
-            document.getElementById('grade-sub').innerText = `${exam.Subject} | ${exam.Class} - ${exam.Batch}`;
-            
-            // Switch screen visually
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('grading-screen').classList.add('active');
+        function deleteVideo(id) { if(confirm("Delete this video?")) db.collection("Videos").doc(id).delete(); }
 
-            // Load Students for this specific Class and Batch
-            const listContainer = document.getElementById('grading-list');
-            listContainer.innerHTML = '';
-            
-            const studentsInExam = allStudents.filter(s => s.Class === exam.Class && s.Batch === exam.Batch);
-            
-            if(studentsInExam.length === 0) {
-                listContainer.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No students found in ${exam.Class} ${exam.Batch}.</div>`;
-                return;
-            }
-
-            studentsInExam.forEach(student => {
-                const existingScore = (exam.Scores && exam.Scores[student.id]) ? exam.Scores[student.id] : "";
-                listContainer.innerHTML += `
-                    <div class="grade-item">
-                        <span style="font-weight: 600; color: #333; font-size: 0.95rem;">${student.Name}</span>
-                        <input type="text" class="grade-input" id="score-${student.id}" value="${existingScore}" placeholder="e.g. 45/50">
-                    </div>
-                `;
-            });
-        }
-
-        function saveGrading() {
-            const exam = allExams.find(e => e.id === currentGradingExamId);
-            const studentsInExam = allStudents.filter(s => s.Class === exam.Class && s.Batch === exam.Batch);
-            
-            let newScores = {};
-            studentsInExam.forEach(student => {
-                const inputVal = document.getElementById(`score-${student.id}`).value.trim();
-                if (inputVal !== "") {
-                    newScores[student.id] = inputVal;
-                }
-            });
-
-            db.collection("Exams").doc(currentGradingExamId).update({ Scores: newScores })
-              .then(() => {
-                  alert("Marks Saved Successfully!");
-                  switchTab('exams');
-              }).catch(err => alert("Error saving marks."));
-        }
-
-        function deleteExam() {
-            if(!confirm(`⚠️ Are you sure you want to delete this Exam completely?`)) return;
-            let pwd = prompt(`🔐 Enter Admin Password to confirm delete:`);
-            if(pwd) {
-                auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(() => {
-                    db.collection("Exams").doc(currentGradingExamId).delete().then(() => {
-                        alert(`Exam deleted.`);
-                        switchTab('exams');
-                    });
-                }).catch(() => alert("❌ Incorrect Password."));
-            }
-        }
-
-        // =========================================================
-        // STANDARD DASHBOARD & DIRECTORY FUNCTIONS (Preserved)
-        // =========================================================
-        function listenToAttendanceForDate() {
-            if (attendanceListenerUnsubscribe) attendanceListenerUnsubscribe();
-            attendanceListenerUnsubscribe = db.collection("Attendance").where("date", "==", selectedDate).onSnapshot((snapshot) => {
-                markedToday = {};
-                snapshot.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; });
-                if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
-            });
-        }
+        // --- PREVIOUS ADMIN FUNCTIONS ---
+        function listenToAttendanceForDate() { if(attendanceListenerUnsubscribe) attendanceListenerUnsubscribe(); attendanceListenerUnsubscribe = db.collection("Attendance").where("date", "==", selectedDate).onSnapshot((snap) => { markedToday = {}; snap.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; }); if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList(); }); }
         function changeDate() { selectedDate = document.getElementById('view-date').value; listenToAttendanceForDate(); }
-
-        function renderFolders() {
-            const container = document.getElementById('folders-container'); container.innerHTML = '';
-            let grouped = {};
-            allStudents.forEach(s => { let c = s.Class || "Unk"; let b = s.Batch || "Unk"; if(!grouped[c]) grouped[c] = {}; if(!grouped[c][b]) grouped[c][b] = 0; grouped[c][b]++; });
-            ["8th", "9th", "10th", "Unk"].forEach(cls => {
-                if(grouped[cls]) {
-                    let html = `<div class="class-group"><h3 class="class-title">Class ${cls}</h3><div class="folder-grid">`;
-                    Object.keys(grouped[cls]).sort().forEach(batch => {
-                        html += `<div class="folder-card" onclick="openBatchView('${cls}', '${batch}')"><i class="fas fa-folder"></i><h4>Batch ${batch}</h4><p>${grouped[cls][batch]} Students</p></div>`;
-                    });
-                    container.innerHTML += html + `</div></div>`;
-                }
-            });
-        }
-
-        function openBatchView(cls, batch) {
-            currentViewClass = cls; currentViewBatch = batch;
-            document.getElementById('current-batch-title').innerText = `${cls} - ${batch}`;
-            selectedDate = new Date().toISOString().split('T')[0]; document.getElementById('view-date').value = selectedDate; changeDate();
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('batch-screen').classList.add('active'); renderBatchList();
-        }
-
-        function toggleBatchMode(mode) { currentBatchMode = mode; document.getElementById('btn-att').className = `tab-btn ${mode==='attendance'?'active':''}`; document.getElementById('btn-fee').className = `tab-btn ${mode==='fees'?'active':''}`; document.getElementById('attendance-date-box').style.display = (mode === 'attendance') ? 'flex' : 'none'; renderBatchList(); }
-
-        function renderBatchList() {
-            const container = document.getElementById('batch-list-container'); container.innerHTML = '';
-            const filtered = allStudents.filter(s => s.Class === currentViewClass && s.Batch === currentViewBatch);
-            filtered.forEach(student => {
-                if (currentBatchMode === 'attendance') {
-                    let btn = `<button class="btn-history" onclick="viewHistory('${student.id}', '${student.Name}')"><i class="fas fa-calendar-alt"></i> View History</button>`;
-                    if (markedToday[student.id]) {
-                        container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div style="text-align:center;"><span class="status-tag ${markedToday[student.id]==='Present'?'tag-present':'tag-absent'}">Marked: ${markedToday[student.id]}</span>${btn}</div></div>`;
-                    } else {
-                        container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="action-btns"><button class="btn-present" onclick="markAttendance('${student.id}', '${student.Name}', 'Present')">Present</button><button class="btn-absent" onclick="markAttendance('${student.id}', '${student.Name}', 'Absent')">Absent</button></div>${btn}</div>`;
-                    }
-                } else {
-                    const t = Number(student.TotalFee) || 0; const p = Number(student.PaidFee) || 0; const pend = t - p;
-                    container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="fee-stats"><div><span style="color:#888;">Total</span><span class="fee-val">₹${t}</span></div><div><span style="color:#888;">Paid</span><span class="fee-val text-success">₹${p}</span></div><div><span style="color:#888;">Pending</span><span class="fee-val text-danger">₹${pend}</span></div></div><button class="btn-pay" onclick="recordPayment('${student.id}', '${student.Name}', ${p}, ${pend})">Record Payment</button></div>`;
-                }
-            });
-        }
-
-        function renderDirectory() {
-            const container = document.getElementById('directory-list'); const query = document.getElementById('search-input').value.toLowerCase(); container.innerHTML = '';
-            allStudents.filter(s => s.Name.toLowerCase().includes(query) || (s.Phone && s.Phone.includes(query))).forEach(student => {
-                container.innerHTML += `<div class="card"><div class="card-header"><h3>${student.Name}</h3><span class="badge">${student.Class} - ${student.Batch}</span></div><p style="font-size:0.85rem; color:#666; margin-bottom:10px;"><i class="fas fa-phone"></i> ${student.Phone}</p><div class="dir-actions"><button class="btn-edit" onclick="openEditModal('${student.id}')"><i class="fas fa-edit"></i> Edit</button><button class="btn-del" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i> Del</button></div></div>`;
-            });
-        }
-
+        function renderFolders() { const container = document.getElementById('folders-container'); container.innerHTML = ''; let grouped = {}; allStudents.forEach(s => { let c = s.Class || "Unk"; let b = s.Batch || "Unk"; if(!grouped[c]) grouped[c] = {}; if(!grouped[c][b]) grouped[c][b] = 0; grouped[c][b]++; }); ["8th", "9th", "10th", "Unk"].forEach(cls => { if(grouped[cls]) { let html = `<div class="class-group"><h3 class="class-title">Class ${cls}</h3><div class="folder-grid">`; Object.keys(grouped[cls]).sort().forEach(batch => { html += `<div class="folder-card" onclick="openBatchView('${cls}', '${batch}')"><i class="fas fa-folder"></i><h4>Batch ${batch}</h4><p>${grouped[cls][batch]} Students</p></div>`; }); container.innerHTML += html + `</div></div>`; } }); }
+        function openBatchView(c, b) { currentViewClass = c; currentViewBatch = b; document.getElementById('current-batch-title').innerText = `${c} - ${b}`; selectedDate = new Date().toISOString().split('T')[0]; document.getElementById('view-date').value = selectedDate; changeDate(); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('batch-screen').classList.add('active'); renderBatchList(); }
+        function toggleBatchMode(m) { currentBatchMode = m; document.getElementById('btn-att').className = `tab-btn ${m==='attendance'?'active':''}`; document.getElementById('btn-fee').className = `tab-btn ${m==='fees'?'active':''}`; document.getElementById('attendance-date-box').style.display = (m === 'attendance') ? 'flex' : 'none'; renderBatchList(); }
+        function renderBatchList() { const container = document.getElementById('batch-list-container'); container.innerHTML = ''; const filtered = allStudents.filter(s => s.Class === currentViewClass && s.Batch === currentViewBatch); filtered.forEach(student => { if (currentBatchMode === 'attendance') { let btn = `<button class="btn-history" onclick="viewHistory('${student.id}', '${student.Name}')"><i class="fas fa-calendar-alt"></i> History</button>`; if (markedToday[student.id]) { container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div style="text-align:center;"><span class="status-tag ${markedToday[student.id]==='Present'?'tag-present':'tag-absent'}">Marked: ${markedToday[student.id]}</span>${btn}</div></div>`; } else { container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="action-btns"><button class="btn-present" onclick="markAttendance('${student.id}', '${student.Name}', 'Present')">Present</button><button class="btn-absent" onclick="markAttendance('${student.id}', '${student.Name}', 'Absent')">Absent</button></div>${btn}</div>`; } } else { const t = Number(student.TotalFee) || 0; const p = Number(student.PaidFee) || 0; const pend = t - p; container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="fee-stats"><div><span style="color:#888;">Total</span><span class="fee-val">₹${t}</span></div><div><span style="color:#888;">Paid</span><span class="fee-val text-success">₹${p}</span></div><div><span style="color:#888;">Pending</span><span class="fee-val text-danger">₹${pend}</span></div></div><button class="btn-pay" onclick="recordPayment('${student.id}', '${student.Name}', ${p}, ${pend})">Record Payment</button></div>`; } }); }
+        function renderDirectory() { const container = document.getElementById('directory-list'); const query = document.getElementById('search-input').value.toLowerCase(); container.innerHTML = ''; allStudents.filter(s => s.Name.toLowerCase().includes(query) || (s.Phone && s.Phone.includes(query))).forEach(student => { container.innerHTML += `<div class="card"><div class="card-header"><h3>${student.Name}</h3><span class="badge">${student.Class} - ${student.Batch}</span></div><p style="font-size:0.85rem; color:#666; margin-bottom:10px;"><i class="fas fa-phone"></i> ${student.Phone}</p><div class="dir-actions"><button class="btn-edit" onclick="openEditModal('${student.id}')"><i class="fas fa-edit"></i> Edit</button><button class="btn-del" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i> Del</button></div></div>`; }); }
         function markAttendance(id, name, status) { db.collection("Attendance").doc(`${id}_${selectedDate}`).set({ studentId: id, studentName: name, date: selectedDate, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); }
-        function recordPayment(id, name, cPaid, pending) { if(pending<=0) return alert("Fully paid!"); let amt = parseInt(prompt(`Pending: ₹${pending}\nAmount received:`)); if(!isNaN(amt) && amt>0) db.collection("Students").doc(id).update({ PaidFee: cPaid + amt }); }
-        function addNewStudent() {
-            const n = document.getElementById('new-name').value.trim(); const p = document.getElementById('new-phone').value.trim(); const c = document.getElementById('new-class').value; let b = document.getElementById('new-batch').value.trim().toUpperCase(); const t = Number(document.getElementById('new-total').value); const pd = Number(document.getElementById('new-paid').value);
-            if(!n || !p) return alert("Required fields missing!"); if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch (e.g. A1)");
-            db.collection("Students").add({ Name: n, Phone: p, Class: c, Batch: b, TotalFee: t, PaidFee: pd }).then(() => { alert("Added!"); document.getElementById('new-name').value=''; document.getElementById('new-phone').value=''; document.getElementById('new-batch').value=''; switchTab('dashboard'); });
-        }
+        function recordPayment(id, name, cPaid, pending) { if(pending<=0) return alert("Fully paid!"); let amt = parseInt(prompt(`Pending: ₹${pending}\nAmount:`)); if(!isNaN(amt) && amt>0) db.collection("Students").doc(id).update({ PaidFee: cPaid + amt }); }
+        function addNewStudent() { const n = document.getElementById('new-name').value.trim(); const p = document.getElementById('new-phone').value.trim(); const c = document.getElementById('new-class').value; let b = document.getElementById('new-batch').value.trim().toUpperCase(); const t = Number(document.getElementById('new-total').value); const pd = Number(document.getElementById('new-paid').value); if(!n || !p) return alert("Missing fields"); if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch"); db.collection("Students").add({ Name: n, Phone: p, Class: c, Batch: b, TotalFee: t, PaidFee: pd }).then(() => { alert("Added!"); document.getElementById('new-name').value=''; document.getElementById('new-phone').value=''; document.getElementById('new-batch').value=''; switchTab('dashboard'); }); }
         function deleteStudent(id, name) { if(prompt(`Type DELETE to confirm ${name}`)==="DELETE") { let pwd = prompt("Admin Password:"); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(()=>db.collection("Students").doc(id).delete().then(()=>alert("Deleted"))).catch(()=>alert("Wrong Password")); } }
-        function deleteCurrentBatch() { let batch = `${currentViewClass} - ${currentViewBatch}`; if(prompt("Type DELETE to erase batch")==="DELETE") { let pwd = prompt("Admin Password:"); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(()=>{ db.collection("Students").where("Class","==",currentViewClass).where("Batch","==",currentViewBatch).get().then(snap=>{ const b = db.batch(); snap.forEach(d=>b.delete(d.ref)); return b.commit(); }).then(()=>{alert("Batch Deleted");switchTab('dashboard');}); }); } }
+        function deleteCurrentBatch() { let batch = `${currentViewClass} - ${currentViewBatch}`; if(prompt("Type DELETE to erase batch")==="DELETE") { let pwd = prompt("Admin Password:"); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(()=>{ db.collection("Students").where("Class","==",currentViewClass).where("Batch","==",currentViewBatch).get().then(snap=>{ const b = db.batch(); snap.forEach(d=>b.delete(d.ref)); return b.commit(); }).then(()=>{alert("Deleted");switchTab('dashboard');}); }); } }
         function openEditModal(id) { const s = allStudents.find(x=>x.id===id); if(!s) return; document.getElementById('edit-id').value=s.id; document.getElementById('edit-name').value=s.Name; document.getElementById('edit-phone').value=s.Phone; document.getElementById('edit-class').value=s.Class; document.getElementById('edit-batch').value=s.Batch; document.getElementById('edit-total').value=s.TotalFee||0; document.getElementById('edit-paid').value=s.PaidFee||0; document.getElementById('edit-modal').style.display='flex'; }
         function closeEditModal() { document.getElementById('edit-modal').style.display='none'; }
         function saveEdit() { const id = document.getElementById('edit-id').value; let b = document.getElementById('edit-batch').value.trim().toUpperCase(); if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch"); db.collection("Students").doc(id).update({ Name: document.getElementById('edit-name').value, Phone: document.getElementById('edit-phone').value, Class: document.getElementById('edit-class').value, Batch: b, TotalFee: Number(document.getElementById('edit-total').value), PaidFee: Number(document.getElementById('edit-paid').value) }).then(()=>closeEditModal()); }
-        
-        function viewHistory(sId, sName) {
-            document.getElementById('history-title').innerText = `${sName}'s History`; document.getElementById('history-modal').style.display='flex'; document.getElementById('history-list').innerHTML = "Loading...";
-            db.collection("Attendance").where("studentId","==",sId).get().then(snap => {
-                if(snap.empty) return document.getElementById('history-list').innerHTML = "No records.";
-                let recs = []; snap.forEach(d=>recs.push(d.data())); recs.sort((a,b)=>new Date(b.date)-new Date(a.date));
-                let pres = recs.filter(r=>r.status==='Present').length; let html = `<div><b>${Math.round((pres/recs.length)*100)}%</b> Overall</div>`;
-                recs.forEach(r => html += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee;"><span>${r.date}</span><b>${r.status}</b></div>`);
-                document.getElementById('history-list').innerHTML = html;
-            });
-        }
+        function viewHistory(sId, sName) { document.getElementById('history-title').innerText = `${sName}'s History`; document.getElementById('history-modal').style.display='flex'; document.getElementById('history-list').innerHTML = "Loading..."; db.collection("Attendance").where("studentId","==",sId).get().then(snap => { if(snap.empty) return document.getElementById('history-list').innerHTML = "No records."; let recs = []; snap.forEach(d=>recs.push(d.data())); recs.sort((a,b)=>new Date(b.date)-new Date(a.date)); let pres = recs.filter(r=>r.status==='Present').length; let html = `<div><b>${Math.round((pres/recs.length)*100)}%</b> Overall</div>`; recs.forEach(r => html += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee;"><span>${r.date}</span><b>${r.status}</b></div>`); document.getElementById('history-list').innerHTML = html; }); }
         function closeHistoryModal() { document.getElementById('history-modal').style.display='none'; }
+        function createNewExam() { const title = document.getElementById('ex-title').value.trim(); const subject = document.getElementById('ex-subject').value.trim(); const date = document.getElementById('ex-date').value; const cls = document.getElementById('ex-class').value; let batch = document.getElementById('ex-batch').value.trim().toUpperCase(); if(!title || !subject || !date) return alert("Required!"); if (batch === "") { let batchesForClass = new Set(allStudents.filter(s => s.Class === cls).map(s => s.Batch)); if(batchesForClass.size === 0) return alert(`No students in Class ${cls}`); let batchPromises = Array.from(batchesForClass).map(b => db.collection("Exams").add({ Title: title, Subject: subject, Date: date, Class: cls, Batch: b, Scores: {} })); Promise.all(batchPromises).then(() => { alert(`Success!`); document.getElementById('add-exam-modal').style.display='none'; }); } else { db.collection("Exams").add({ Title: title, Subject: subject, Date: date, Class: cls, Batch: batch, Scores: {} }).then(() => { alert("Scheduled!"); document.getElementById('add-exam-modal').style.display='none'; }); } }
+        function renderExamsList() { const container = document.getElementById('exams-list-container'); container.innerHTML = ''; if(allExams.length === 0) return container.innerHTML = `No exams yet.`; allExams.forEach(exam => { const dObj = new Date(exam.Date); const prettyDate = dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); const gradedCount = Object.keys(exam.Scores || {}).length; container.innerHTML += `<div class="card" style="border-left-color: #f59e0b;"><div class="card-header"><h3 style="color: var(--primary-blue);">${exam.Title}</h3><span class="badge" style="background: #fef3c7; color: #b45309;">${exam.Class} - ${exam.Batch}</span></div><p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;"><strong>Subject:</strong> ${exam.Subject} <br><i class="fas fa-calendar-day"></i> ${prettyDate}</p><div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 0.8rem; color: #888; font-weight: bold;">${gradedCount} Graded</span><button class="btn-grade" style="flex: none; padding: 6px 15px;" onclick="openGrading('${exam.id}')"><i class="fas fa-edit"></i> Marks</button></div></div>`; }); }
+        function openGrading(examId) { const exam = allExams.find(e => e.id === examId); if(!exam) return; currentGradingExamId = examId; document.getElementById('grade-title').innerText = exam.Title; document.getElementById('grade-sub').innerText = `${exam.Subject} | ${exam.Class} - ${exam.Batch}`; document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('grading-screen').classList.add('active'); const listContainer = document.getElementById('grading-list'); listContainer.innerHTML = ''; const studentsInExam = allStudents.filter(s => s.Class === exam.Class && s.Batch === exam.Batch); if(studentsInExam.length === 0) return listContainer.innerHTML = `No students found.`; studentsInExam.forEach(student => { const existingScore = (exam.Scores && exam.Scores[student.id]) ? exam.Scores[student.id] : ""; listContainer.innerHTML += `<div class="grade-item"><span style="font-weight: 600; color: #333;">${student.Name}</span><input type="text" class="grade-input" id="score-${student.id}" value="${existingScore}"></div>`; }); }
+        function saveGrading() { const exam = allExams.find(e => e.id === currentGradingExamId); const studentsInExam = allStudents.filter(s => s.Class === exam.Class && s.Batch === exam.Batch); let newScores = {}; studentsInExam.forEach(student => { const inputVal = document.getElementById(`score-${student.id}`).value.trim(); if (inputVal !== "") newScores[student.id] = inputVal; }); db.collection("Exams").doc(currentGradingExamId).update({ Scores: newScores }).then(() => { alert("Marks Saved!"); switchTab('exams'); }); }
+        function deleteExam() { if(confirm(`⚠️ Delete Exam completely?`)) { let pwd = prompt(`Password:`); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(() => db.collection("Exams").doc(currentGradingExamId).delete().then(() => switchTab('exams'))).catch(() => alert("❌ Wrong Password.")); } }
     </script>
 </body>
 </html>
