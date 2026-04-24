@@ -125,7 +125,8 @@
         <div id="batch-screen" class="screen">
             <div class="batch-header">
                 <button class="back-btn" onclick="switchTab('dashboard')"><i class="fas fa-arrow-left"></i> Back</button>
-                <h2 id="current-batch-title" style="font-size: 1.2rem; color: var(--primary-blue);">Class - Batch</h2>
+                <h2 id="current-batch-title" style="font-size: 1.2rem; color: var(--primary-blue); margin: 0 10px;">Class - Batch</h2>
+                <button onclick="deleteCurrentBatch()" style="background: none; border: none; color: var(--danger); font-size: 1.3rem; cursor: pointer; transition: 0.2s;" title="Delete Entire Batch"><i class="fas fa-trash-alt"></i></button>
             </div>
             
             <div class="tab-toggles">
@@ -257,14 +258,13 @@
         let markedToday = {};
         let currentViewClass = '';
         let currentViewBatch = '';
-        let currentBatchMode = 'attendance'; // or 'fees'
+        let currentBatchMode = 'attendance';
 
         // =========================================================
         // AUTHENTICATION
         // =========================================================
         auth.onAuthStateChanged(user => {
             if (user) {
-                // Extract Name from Email (e.g., "admin@..." -> "Admin")
                 let adminName = user.email.split('@')[0];
                 adminName = adminName.charAt(0).toUpperCase() + adminName.slice(1);
                 document.getElementById('admin-greeting').innerText = `Hey, ${adminName}! 👋`;
@@ -274,7 +274,7 @@
                 document.getElementById('logout-btn').style.display = 'block';
                 
                 switchTab('dashboard');
-                initRealtimeSync(); // Start listening to database changes
+                initRealtimeSync(); 
             } else {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('login-screen').classList.add('active');
@@ -322,26 +322,22 @@
         }
 
         // =========================================================
-        // REAL-TIME DATA SYNC (The Efficiency Engine)
+        // REAL-TIME DATA SYNC
         // =========================================================
         function initRealtimeSync() {
             const today = new Date().toISOString().split('T')[0];
             
-            // 1. Listen to Today's Attendance
             db.collection("Attendance").where("date", "==", today).onSnapshot((snapshot) => {
                 markedToday = {};
                 snapshot.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; });
                 if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
             });
 
-            // 2. Listen to Students Database
             db.collection("Students").onSnapshot((snapshot) => {
                 allStudents = [];
                 snapshot.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() }));
-                // Sort Alphabetically
                 allStudents.sort((a, b) => a.Name.localeCompare(b.Name));
                 
-                // Update active screens
                 if(document.getElementById('dashboard-screen').classList.contains('active')) renderFolders();
                 if(document.getElementById('directory-screen').classList.contains('active')) renderDirectory();
                 if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
@@ -355,7 +351,6 @@
             const container = document.getElementById('folders-container');
             container.innerHTML = '';
 
-            // Group students dynamically into { "9th": { "A1": 15, "A2": 10 } }
             let grouped = {};
             allStudents.forEach(student => {
                 let c = student.Class || "Unknown";
@@ -365,14 +360,11 @@
                 grouped[c][b]++;
             });
 
-            // Standard order for classes if they exist
             const classOrder = ["8th", "9th", "10th", "Unknown"];
             
             classOrder.forEach(cls => {
                 if(grouped[cls]) {
                     let html = `<div class="class-group"><h3 class="class-title">Class ${cls}</h3><div class="folder-grid">`;
-                    
-                    // Sort batches alphabetically (A1, A2, B1...)
                     let batches = Object.keys(grouped[cls]).sort();
                     
                     batches.forEach(batch => {
@@ -398,7 +390,7 @@
         function openBatchView(cls, batch) {
             currentViewClass = cls;
             currentViewBatch = batch;
-            document.getElementById('current-batch-title').innerText = `Class ${cls} - Batch ${batch}`;
+            document.getElementById('current-batch-title').innerText = `${cls} - ${batch}`;
             
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('batch-screen').classList.add('active');
@@ -422,7 +414,6 @@
 
             filtered.forEach(student => {
                 if (currentBatchMode === 'attendance') {
-                    // Render Attendance UI
                     let actionHtml = '';
                     if (markedToday[student.id]) {
                         const status = markedToday[student.id];
@@ -441,7 +432,6 @@
                             ${actionHtml}
                         </div>`;
                 } else {
-                    // Render Fees UI
                     const totalFee = Number(student.TotalFee) || 0;
                     const paidFee = Number(student.PaidFee) || 0;
                     const pendingFee = totalFee - paidFee;
@@ -496,7 +486,7 @@
             const today = new Date().toISOString().split('T')[0];
             db.collection("Attendance").doc(`${id}_${today}`).set({
                 studentId: id, studentName: name, date: today, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }); // Real-time listener will auto-update the UI
+            }); 
         }
 
         function recordPayment(id, name, currentPaid, pending) {
@@ -511,13 +501,12 @@
             const name = document.getElementById('new-name').value.trim();
             const phone = document.getElementById('new-phone').value.trim();
             const cls = document.getElementById('new-class').value;
-            let batch = document.getElementById('new-batch').value.trim().toUpperCase(); // Auto Uppercase
+            let batch = document.getElementById('new-batch').value.trim().toUpperCase();
             const total = Number(document.getElementById('new-total').value);
             const paid = Number(document.getElementById('new-paid').value);
 
             if(!name || !phone) { alert("Name and Phone required!"); return; }
             
-            // SMART BATCH VALIDATION (Must be Letter followed by Number, e.g. A1, B3)
             if(!/^[A-Z]\d+$/.test(batch)) {
                 alert("Invalid Batch format! Please use a letter followed by a number (e.g., A1, B2, C3).");
                 return;
@@ -539,6 +528,61 @@
                     db.collection("Students").doc(id).delete().then(() => alert(`${name} deleted.`));
                 }).catch(() => alert("❌ Incorrect Password."));
             }
+        }
+
+        // =========================================================
+        // NEW: TRIPLE-LOCK BULK DELETE BATCH
+        // =========================================================
+        function deleteCurrentBatch() {
+            const batchName = `${currentViewClass} - ${currentViewBatch}`;
+            
+            // Lock 1: Standard Warning
+            if (!confirm(`⚠️ CRITICAL WARNING:\nAre you sure you want to permanently delete ALL students in ${batchName}?`)) return;
+
+            // Lock 2: Type Confirmation
+            let checkWord = prompt(`⚠️ SECOND WARNING:\nThis will erase every student in this batch.\nType the word DELETE (in all caps) to confirm.`);
+            if (checkWord !== "DELETE") {
+                alert("Batch deletion cancelled.");
+                return;
+            }
+
+            // Lock 3: Admin Password Verification
+            let pwd = prompt(`🔐 FINAL SECURITY CHECK:\nEnter your Admin Login Password to permanently destroy ${batchName}.`);
+            if (pwd === null || pwd.trim() === "") {
+                alert("Password required. Deletion cancelled.");
+                return;
+            }
+
+            // Verify Password & Execute Bulk Delete
+            const userEmail = auth.currentUser.email;
+            auth.signInWithEmailAndPassword(userEmail, pwd)
+                .then(() => {
+                    // Password correct! Find all students in this batch
+                    db.collection("Students")
+                        .where("Class", "==", currentViewClass)
+                        .where("Batch", "==", currentViewBatch)
+                        .get()
+                        .then((querySnapshot) => {
+                            // Use a Firestore Batch to delete them all efficiently
+                            const firestoreBatch = db.batch();
+                            querySnapshot.forEach((doc) => {
+                                firestoreBatch.delete(doc.ref);
+                            });
+                            
+                            return firestoreBatch.commit(); // Execute the mass deletion
+                        })
+                        .then(() => {
+                            alert(`✅ Entire batch (${batchName}) has been permanently deleted.`);
+                            switchTab('dashboard'); // Kick them back to the main menu (the folder will disappear automatically)
+                        })
+                        .catch((error) => {
+                            console.error("Error removing batch: ", error);
+                            alert("Error deleting batch. Check internet connection.");
+                        });
+                })
+                .catch(err => {
+                    alert("❌ Incorrect Password. Batch deletion blocked.");
+                });
         }
 
         // EDIT MODAL LOGIC
