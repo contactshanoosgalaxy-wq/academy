@@ -30,7 +30,7 @@
             background-color: var(--bg-light);
             color: var(--text-dark);
             overflow-x: hidden;
-            padding-top: 80px; /* Space for fixed navbar */
+            padding-top: 80px;
         }
 
         /* --- Top Navigation Bar --- */
@@ -113,7 +113,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Floating 3D Elements */
         .shape {
             position: absolute;
             background: rgba(255, 255, 255, 0.1);
@@ -171,7 +170,7 @@
             box-shadow: 0 15px 25px rgba(0,0,0,0.3);
         }
 
-        /* --- 3D Cards Section --- */
+        /* --- Global Section Settings --- */
         .section {
             padding: 80px 20px;
             max-width: 1200px;
@@ -185,6 +184,7 @@
             margin-bottom: 50px;
         }
 
+        /* --- 3D Cards Section --- */
         .cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -213,6 +213,67 @@
 
         .tilt-card h3 { font-size: 1.5rem; margin-bottom: 15px; transform: translateZ(30px); }
         .tilt-card p { color: #555; transform: translateZ(20px); }
+
+        /* --- Admission Form Section --- */
+        .form-container {
+            background: var(--white);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            max-width: 900px;
+            margin: 0 auto;
+            border-top: 5px solid var(--primary-blue);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccd6e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 86, 214, 0.1);
+            background: var(--white);
+        }
+
+        .submit-btn {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 45, 114, 0.2);
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: var(--light-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(0, 45, 114, 0.3);
+        }
 
         /* --- Details & Branches Section --- */
         .info-grid {
@@ -254,29 +315,10 @@
             margin: 0 auto;
         }
 
-        .footer-logo {
-            font-size: 1.5rem;
-            color: var(--white);
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: var(--footer-text);
-            text-decoration: none;
-            transition: color 0.3s;
-            font-size: 1.5rem;
-        }
-
-        .footer-links a:hover {
-            color: var(--white);
-        }
+        .footer-logo { font-size: 1.5rem; color: var(--white); font-weight: 600; margin-bottom: 10px; }
+        .footer-links { display: flex; gap: 20px; margin-bottom: 10px; }
+        .footer-links a { color: var(--footer-text); text-decoration: none; transition: color 0.3s; font-size: 1.5rem; }
+        .footer-links a:hover { color: var(--white); }
 
         .copyright {
             opacity: 0.7;
@@ -291,11 +333,18 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* --- Responsive Media Queries --- */
+        @media (max-width: 992px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .form-container { padding: 40px 30px; }
+        }
+
         @media (max-width: 768px) {
             .navbar { padding: 0 20px; }
-            .nav-links { display: none; /* Hides menu text on mobile for cleaner look */ }
+            .nav-links { display: none; } /* Hides text links on mobile */
             .hero-content h1 { font-size: 2.5rem; }
-            .info-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; } /* Stacks form inputs on mobile */
+            .info-box { padding: 30px; }
         }
     </style>
 </head>
@@ -306,6 +355,7 @@
         <ul class="nav-links">
             <li><a href="#">Home</a></li>
             <li><a href="#about">About</a></li>
+            <li><a href="#admission">Admissions</a></li>
             <li><a href="#branches">Branches</a></li>
         </ul>
         <div class="nav-socials">
@@ -322,7 +372,7 @@
         <div class="hero-content">
             <h1>ACADEMY MADAVOOR</h1>
             <p>Empowering Students Since 1996</p>
-            <a href="#about" class="btn">Discover Our Legacy</a>
+            <a href="#admission" class="btn">Join Now</a>
         </div>
     </section>
 
@@ -347,6 +397,40 @@
         </div>
     </section>
 
+    <section class="section" id="admission">
+        <h2 class="section-title">Student Registration</h2>
+        <div class="form-container">
+            <form id="studentDataForm" onsubmit="event.preventDefault(); alert('Form design is ready! Database connection coming soon.');">
+                
+                <div class="form-row">
+                    <input type="text" class="form-control" placeholder="Student Full Name" required>
+                    <input type="tel" class="form-control" placeholder="Phone Number" required>
+                </div>
+
+                <div class="form-row">
+                    <input type="text" class="form-control" placeholder="School Name" required>
+                    <select class="form-control" required>
+                        <option value="" disabled selected>Select Class</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <select class="form-control" required>
+                        <option value="" disabled selected>Select Preferred Branch</option>
+                        <option value="Chakkalakal">Chakkalakal</option>
+                        <option value="Narikkuni">Narikkuni</option>
+                        <option value="Mariveettil Thazham">Mariveettil Thazham</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Details</button>
+            </form>
+        </div>
+    </section>
+
     <section class="section" id="branches">
         <div class="info-grid">
             <div class="info-box">
@@ -359,7 +443,6 @@
                 <h2>Our Network</h2>
                 <p style="margin-bottom: 20px;">Providing quality education across Kozhikode.</p>
                 <ul class="branch-list">
-                    <li><i class="fas fa-map-marker-alt"></i> Madavoor (Main Branch)</li>
                     <li><i class="fas fa-map-marker-alt"></i> Chakkalakal</li>
                     <li><i class="fas fa-map-marker-alt"></i> Narikkuni</li>
                     <li><i class="fas fa-map-marker-alt"></i> Mariveettil Thazham</li>
@@ -390,25 +473,28 @@
         const cards = document.querySelectorAll('.tilt-card');
 
         cards.forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; 
-                const y = e.clientY - rect.top;  
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = ((y - centerY) / centerY) * -15; 
-                const rotateY = ((x - centerX) / centerX) * 15;
+            // Only apply 3D effect on larger screens (PC/Tablets) to keep mobile smooth
+            if (window.innerWidth > 768) {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; 
+                    const y = e.clientY - rect.top;  
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = ((y - centerY) / centerY) * -15; 
+                    const rotateY = ((x - centerX) / centerX) * 15;
 
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
-                card.style.boxShadow = `${-rotateY}px ${rotateX}px 30px rgba(0, 45, 114, 0.2)`;
-            });
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                    card.style.boxShadow = `${-rotateY}px ${rotateX}px 30px rgba(0, 45, 114, 0.2)`;
+                });
 
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-                card.style.boxShadow = `0 15px 35px rgba(0,45,114,0.1)`;
-            });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    card.style.boxShadow = `0 15px 35px rgba(0,45,114,0.1)`;
+                });
+            }
         });
     </script>
 
