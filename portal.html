@@ -18,29 +18,51 @@
         body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; }
 
         #app-container { width: 100%; max-width: 450px; min-height: 100vh; background: var(--bg-color); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding-bottom: 80px; }
-        header { background: var(--primary-blue); color: var(--white); padding: 20px; text-align: center; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 10px rgba(0,59,142,0.2); position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; }
+        header { background: var(--primary-blue); color: var(--white); padding: 20px; text-align: center; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 10px rgba(0,59,142,0.2); position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;}
         #logout-btn { display: none; background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
-
-        .filter-bar { background: var(--white); padding: 15px; display: none; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: sticky; top: 68px; z-index: 15; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; }
-        .filter-select { flex: 1; padding: 10px; border: 1px solid #ccd6e0; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: var(--primary-blue); outline: none; background: #f8fafc; }
 
         .screen { padding: 20px; display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease; }
 
+        /* Login */
         .login-box { background: var(--white); padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-top: 50px; }
         .login-box h2 { text-align: center; margin-bottom: 20px; color: var(--primary-blue); }
         .form-control { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
-        .btn { width: 100%; padding: 15px; background: var(--primary-blue); color: var(--white); border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-
-        .card { background: var(--white); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 4px solid var(--primary-blue); position: relative;}
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
-        .card h3 { font-size: 1.1rem; color: var(--text-dark); max-width: 70%; }
-        .batch-badge { background: var(--bg-color); color: var(--primary-blue); padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: 700; border: 1px solid #ccd6e0;}
+        .btn { width: 100%; padding: 15px; background: var(--primary-blue); color: var(--white); border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s;}
         
-        /* Delete Button */
-        .btn-delete { background: none; border: none; color: var(--danger); font-size: 1.1rem; cursor: pointer; padding: 5px; transition: 0.2s; }
-        .btn-delete:hover { transform: scale(1.1); }
+        /* Dashboard & Folders */
+        .greeting { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; }
+        .class-group { margin-bottom: 25px; }
+        .class-title { font-size: 1.1rem; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+        .folder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .folder-card { background: var(--white); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .folder-card:hover { border-color: var(--primary-blue); transform: translateY(-3px); }
+        .folder-card i { font-size: 2rem; color: var(--light-blue); margin-bottom: 10px; }
+        .folder-card h4 { color: var(--text-dark); font-size: 1.1rem; }
+        .folder-card p { font-size: 0.8rem; color: #888; margin-top: 5px; }
 
+        /* Batch View Header */
+        .batch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .back-btn { background: #e2e8f0; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; }
+        .tab-toggles { display: flex; background: #e2e8f0; border-radius: 8px; padding: 4px; margin-bottom: 20px;}
+        .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 6px; font-weight: 600; cursor: pointer; color: #555;}
+        .tab-btn.active { background: var(--white); color: var(--primary-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        /* Cards */
+        .card { background: var(--white); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 4px solid var(--primary-blue); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+        .card h3 { font-size: 1.1rem; color: var(--text-dark); }
+        .badge { background: #e2e8f0; color: #555; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; font-weight: 700; }
+        
+        /* Directory Specific */
+        .search-bar { display: flex; background: white; border-radius: 8px; padding: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ddd;}
+        .search-bar input { border: none; outline: none; padding: 10px; flex: 1; font-size: 1rem; }
+        .search-bar i { padding: 12px; color: #888; }
+        .dir-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-edit { background: #fef08a; color: #854d0e; border: none; padding: 8px; border-radius: 6px; flex: 1; font-weight: 600; cursor: pointer; }
+        .btn-del { background: #fecaca; color: #991b1b; border: none; padding: 8px; border-radius: 6px; flex: 1; font-weight: 600; cursor: pointer; }
+
+        /* Attendance & Fees Elements */
         .action-btns { display: flex; gap: 10px; }
         .btn-present, .btn-absent { border: none; padding: 10px 15px; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; flex: 1; }
         .btn-present { background-color: var(--success); }
@@ -48,21 +70,25 @@
         .status-tag { font-size: 0.8rem; padding: 5px 10px; border-radius: 20px; font-weight: 600; display: none; text-align: center; width: 100%;}
         .tag-present { background: #d1fae5; color: #065f46; display: block; }
         .tag-absent { background: #fee2e2; color: #991b1b; display: block; }
-        
         .fee-stats { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 15px; }
         .fee-stats div { text-align: center; }
         .fee-val { font-weight: 700; font-size: 1.1rem; display: block; }
         .text-danger { color: var(--danger); }
         .text-success { color: var(--success); }
         .btn-pay { width: 100%; background: var(--bg-color); color: var(--primary-blue); border: 2px solid var(--primary-blue); padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;}
-        .btn-pay:hover { background: var(--primary-blue); color: var(--white); }
 
+        /* Admin Form */
         .admin-form { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .admin-form label { font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 5px; display: block;}
         .form-row { display: flex; gap: 10px; }
 
+        /* Edit Modal */
+        #edit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-close { float: right; cursor: pointer; font-size: 1.2rem; color: #888; }
+
         /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: var(--white); display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: none; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 20; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: var(--white); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: none; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 20; }
         .nav-item { text-align: center; color: #888; cursor: pointer; transition: 0.3s; width: 33%;}
         .nav-item i { font-size: 1.4rem; display: block; margin-bottom: 5px; }
         .nav-item span { font-size: 0.75rem; font-weight: 600; }
@@ -79,21 +105,6 @@
             <button id="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
         </header>
 
-        <div class="filter-bar" id="filter-bar">
-            <select class="filter-select" id="class-filter" onchange="loadData()">
-                <option value="All">All Classes</option>
-                <option value="8th">Class 8</option>
-                <option value="9th">Class 9</option>
-                <option value="10th">Class 10</option>
-            </select>
-            <select class="filter-select" id="batch-filter" onchange="loadData()">
-                <option value="All">All Batches</option>
-                <option value="A1">Batch A1</option>
-                <option value="A2">Batch A2</option>
-                <option value="B1">Batch B1</option>
-            </select>
-        </div>
-
         <div id="login-screen" class="screen active">
             <div class="login-box">
                 <h2>Staff Login</h2>
@@ -104,50 +115,67 @@
             </div>
         </div>
 
-        <div id="attendance-screen" class="screen">
-            <div id="attendance-list"><div style="text-align: center; color: #888;">Select a Class & Batch...</div></div>
+        <div id="dashboard-screen" class="screen">
+            <div class="greeting" id="admin-greeting">Hey, Admin! 👋</div>
+            <div id="folders-container">
+                <div style="text-align: center; color: #888; padding: 20px;">Loading batches...</div>
+            </div>
         </div>
 
-        <div id="fees-screen" class="screen">
-            <div id="fees-list"><div style="text-align: center; color: #888;">Select a Class & Batch...</div></div>
+        <div id="batch-screen" class="screen">
+            <div class="batch-header">
+                <button class="back-btn" onclick="switchTab('dashboard')"><i class="fas fa-arrow-left"></i> Back</button>
+                <h2 id="current-batch-title" style="font-size: 1.2rem; color: var(--primary-blue);">Class - Batch</h2>
+            </div>
+            
+            <div class="tab-toggles">
+                <button class="tab-btn active" id="btn-att" onclick="toggleBatchMode('attendance')">Attendance</button>
+                <button class="tab-btn" id="btn-fee" onclick="toggleBatchMode('fees')">Fees</button>
+            </div>
+
+            <div id="batch-list-container"></div>
+        </div>
+
+        <div id="directory-screen" class="screen">
+            <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-address-book"></i> Student Directory</h2>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search by name or phone..." onkeyup="renderDirectory()">
+            </div>
+            <div id="directory-list"></div>
         </div>
 
         <div id="add-screen" class="screen">
             <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-user-plus"></i> Add New Admission</h2>
             <div class="admin-form">
                 <label>Student Name</label>
-                <input type="text" id="new-name" class="form-control" placeholder="Full Name" required>
-                
+                <input type="text" id="new-name" class="form-control" placeholder="Full Name">
                 <label>WhatsApp Number</label>
-                <input type="tel" id="new-phone" class="form-control" placeholder="10-digit number" required>
+                <input type="tel" id="new-phone" class="form-control" placeholder="10-digit number">
                 
                 <div class="form-row">
                     <div style="flex: 1;">
                         <label>Class</label>
                         <select id="new-class" class="form-control">
-                            <option value="8th">Class 8</option>
-                            <option value="9th">Class 9</option>
-                            <option value="10th">Class 10</option>
+                            <option value="8th">8th</option>
+                            <option value="9th">9th</option>
+                            <option value="10th">10th</option>
                         </select>
                     </div>
                     <div style="flex: 1;">
                         <label>Batch</label>
-                        <select id="new-batch" class="form-control">
-                            <option value="A1">A1</option>
-                            <option value="A2">A2</option>
-                            <option value="B1">B1</option>
-                        </select>
+                        <input type="text" id="new-batch" class="form-control" placeholder="e.g. A1, B2" maxlength="3">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div style="flex: 1;">
-                        <label>Total Course Fee</label>
-                        <input type="number" id="new-total" class="form-control" placeholder="₹" value="5000" required>
+                        <label>Total Fee</label>
+                        <input type="number" id="new-total" class="form-control" value="5000">
                     </div>
                     <div style="flex: 1;">
                         <label>Advance Paid</label>
-                        <input type="number" id="new-paid" class="form-control" placeholder="₹" value="0" required>
+                        <input type="number" id="new-paid" class="form-control" value="0">
                     </div>
                 </div>
 
@@ -155,22 +183,61 @@
             </div>
         </div>
 
-        <nav class="bottom-nav" id="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('attendance')">
-                <i class="fas fa-calendar-check"></i><span>Attendance</span>
+        <div id="edit-modal">
+            <div class="modal-content">
+                <i class="fas fa-times modal-close" onclick="closeEditModal()"></i>
+                <h3 style="margin-bottom: 15px; color: var(--primary-blue);">Edit Student</h3>
+                <input type="hidden" id="edit-id">
+                <label style="font-size: 0.8rem; font-weight: 600;">Name</label>
+                <input type="text" id="edit-name" class="form-control">
+                <label style="font-size: 0.8rem; font-weight: 600;">Phone</label>
+                <input type="text" id="edit-phone" class="form-control">
+                
+                <div class="form-row">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; font-weight: 600;">Class</label>
+                        <select id="edit-class" class="form-control">
+                            <option value="8th">8th</option>
+                            <option value="9th">9th</option>
+                            <option value="10th">10th</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; font-weight: 600;">Batch</label>
+                        <input type="text" id="edit-batch" class="form-control" maxlength="3">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; font-weight: 600;">Total Fee</label>
+                        <input type="number" id="edit-total" class="form-control">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; font-weight: 600;">Paid Fee</label>
+                        <input type="number" id="edit-paid" class="form-control">
+                    </div>
+                </div>
+                <button class="btn" onclick="saveEdit()"><i class="fas fa-save"></i> Update Details</button>
             </div>
-            <div class="nav-item" onclick="switchTab('fees')">
-                <i class="fas fa-rupee-sign"></i><span>Fees</span>
+        </div>
+
+        <nav class="bottom-nav" id="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('dashboard')">
+                <i class="fas fa-home"></i><span>Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('directory')">
+                <i class="fas fa-users"></i><span>Directory</span>
             </div>
             <div class="nav-item" onclick="switchTab('add')">
-                <i class="fas fa-plus-circle"></i><span>Add Student</span>
+                <i class="fas fa-user-plus"></i><span>New Admit</span>
             </div>
         </nav>
     </div>
 
     <script>
         // =========================================================
-        // YOUR EXACT FIREBASE KEYS (Pre-filled for you!)
+        // FIREBASE CONFIGURATION
         // =========================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDNo7xIyzmcAhOjjnjB5JF2eTiIXY5kfJg",
@@ -180,48 +247,41 @@
             messagingSenderId: "883093460593",
             appId: "1:883093460593:web:489d90f93fa78eb3e1add0"
         };
-        // =========================================================
-
+        
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Global State Variables
+        let allStudents = [];
+        let markedToday = {};
+        let currentViewClass = '';
+        let currentViewBatch = '';
+        let currentBatchMode = 'attendance'; // or 'fees'
+
+        // =========================================================
+        // AUTHENTICATION
+        // =========================================================
         auth.onAuthStateChanged(user => {
             if (user) {
+                // Extract Name from Email (e.g., "admin@..." -> "Admin")
+                let adminName = user.email.split('@')[0];
+                adminName = adminName.charAt(0).toUpperCase() + adminName.slice(1);
+                document.getElementById('admin-greeting').innerText = `Hey, ${adminName}! 👋`;
+
                 document.getElementById('login-screen').classList.remove('active');
-                document.getElementById('attendance-screen').classList.add('active');
-                document.getElementById('logout-btn').style.display = 'block';
                 document.getElementById('bottom-nav').style.display = 'flex';
-                document.getElementById('filter-bar').style.display = 'flex'; 
-                loadData(); 
+                document.getElementById('logout-btn').style.display = 'block';
+                
+                switchTab('dashboard');
+                initRealtimeSync(); // Start listening to database changes
             } else {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('login-screen').classList.add('active');
-                document.getElementById('logout-btn').style.display = 'none';
                 document.getElementById('bottom-nav').style.display = 'none';
-                document.getElementById('filter-bar').style.display = 'none'; 
+                document.getElementById('logout-btn').style.display = 'none';
             }
         });
-
-        function switchTab(tab) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById('filter-bar').style.display = (tab === 'add') ? 'none' : 'flex';
-
-            if(tab === 'attendance') {
-                document.getElementById('attendance-screen').classList.add('active');
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-                loadData();
-            } else if(tab === 'fees') {
-                document.getElementById('fees-screen').classList.add('active');
-                document.querySelectorAll('.nav-item')[1].classList.add('active');
-                loadData();
-            } else if(tab === 'add') {
-                document.getElementById('add-screen').classList.add('active');
-                document.querySelectorAll('.nav-item')[2].classList.add('active');
-            }
-        }
 
         function login() {
             const email = document.getElementById('email').value;
@@ -231,128 +291,219 @@
                 document.getElementById('error-msg').innerText = "Error: " + err.message;
             });
         }
-
         document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
-        function loadData() {
-            const classFilter = document.getElementById('class-filter').value;
-            const batchFilter = document.getElementById('batch-filter').value;
-            const today = new Date().toISOString().split('T')[0];
+        // =========================================================
+        // NAVIGATION & MODES
+        // =========================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            const attList = document.getElementById('attendance-list');
-            const feeList = document.getElementById('fees-list');
-            
-            attList.innerHTML = '<div style="text-align: center; color: #888;">Fetching students...</div>'; 
-            feeList.innerHTML = '<div style="text-align: center; color: #888;">Fetching students...</div>';
-
-            db.collection("Attendance").where("date", "==", today).get().then((attSnapshot) => {
-                let markedToday = {};
-                attSnapshot.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; });
-
-                db.collection("Students").get().then((querySnapshot) => {
-                    attList.innerHTML = ''; feeList.innerHTML = '';
-                    let matchCount = 0;
-
-                    let studentsArray = [];
-                    querySnapshot.forEach(doc => studentsArray.push({ id: doc.id, ...doc.data() }));
-                    studentsArray.sort((a, b) => a.Name.localeCompare(b.Name));
-
-                    studentsArray.forEach((student) => {
-                        if (classFilter !== 'All' && student.Class !== classFilter) return;
-                        if (batchFilter !== 'All' && student.Batch !== batchFilter) return;
-
-                        matchCount++;
-
-                        const totalFee = Number(student.TotalFee) || 0;
-                        const paidFee = Number(student.PaidFee) || 0;
-                        const pendingFee = totalFee - paidFee;
-                        const displayBatch = student.Batch || "No Batch";
-
-                        let actionButtonsHtml = '';
-                        let statusTagHtml = '';
-
-                        if (markedToday[student.id]) {
-                            const status = markedToday[student.id];
-                            const tagClass = status === 'Present' ? 'tag-present' : 'tag-absent';
-                            actionButtonsHtml = `<div class="action-btns" id="btns-${student.id}" style="display:none;"></div>`;
-                            statusTagHtml = `<span id="status-${student.id}" class="status-tag ${tagClass}">Marked: ${status}</span>`;
-                        } else {
-                            actionButtonsHtml = `
-                                <div class="action-btns" id="btns-${student.id}">
-                                    <button class="btn-present" onclick="markAttendance('${student.id}', '${student.Name}', 'Present')">Present</button>
-                                    <button class="btn-absent" onclick="markAttendance('${student.id}', '${student.Name}', 'Absent')">Absent</button>
-                                </div>`;
-                            statusTagHtml = `<span id="status-${student.id}" class="status-tag"></span>`;
-                        }
-
-                        // Attendance Card (With Delete Button)
-                        attList.innerHTML += `
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>${student.Name}</h3>
-                                    <div>
-                                        <span class="batch-badge">${student.Class} - ${displayBatch}</span>
-                                        <button class="btn-delete" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                                ${actionButtonsHtml}
-                                ${statusTagHtml}
-                            </div>`;
-
-                        // Fee Card (With Delete Button)
-                        feeList.innerHTML += `
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>${student.Name}</h3>
-                                    <div>
-                                        <span class="batch-badge">${student.Class} - ${displayBatch}</span>
-                                        <button class="btn-delete" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                                <div class="fee-stats">
-                                    <div><span style="color:#888;">Total</span><span class="fee-val">₹${totalFee}</span></div>
-                                    <div><span style="color:#888;">Paid</span><span class="fee-val text-success">₹${paidFee}</span></div>
-                                    <div><span style="color:#888;">Pending</span><span class="fee-val text-danger">₹${pendingFee}</span></div>
-                                </div>
-                                <button class="btn-pay" onclick="recordPayment('${student.id}', '${student.Name}', ${paidFee}, ${pendingFee})">
-                                    Record Payment
-                                </button>
-                            </div>`;
-                    });
-
-                    if(matchCount === 0) {
-                        const noDataMsg = `<div style="text-align: center; color: #888; padding: 20px;">No students found in this selection.</div>`;
-                        attList.innerHTML = noDataMsg;
-                        feeList.innerHTML = noDataMsg;
-                    }
-                });
-            });
+            if(tab === 'dashboard') {
+                document.getElementById('dashboard-screen').classList.add('active');
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+                renderFolders();
+            } else if(tab === 'directory') {
+                document.getElementById('directory-screen').classList.add('active');
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+                renderDirectory();
+            } else if(tab === 'add') {
+                document.getElementById('add-screen').classList.add('active');
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+            }
         }
 
-        function markAttendance(studentId, studentName, status) {
-            const today = new Date().toISOString().split('T')[0];
-            db.collection("Attendance").doc(`${studentId}_${today}`).set({
-                studentId, studentName, date: today, status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                document.getElementById(`btns-${studentId}`).style.display = 'none';
-                const tag = document.getElementById(`status-${studentId}`);
-                tag.innerText = "Marked: " + status; 
-                tag.className = `status-tag ${status === 'Present' ? 'tag-present' : 'tag-absent'}`;
-                tag.style.display = 'block';
-            });
+        function toggleBatchMode(mode) {
+            currentBatchMode = mode;
+            document.getElementById('btn-att').className = `tab-btn ${mode === 'attendance' ? 'active' : ''}`;
+            document.getElementById('btn-fee').className = `tab-btn ${mode === 'fees' ? 'active' : ''}`;
+            renderBatchList();
         }
 
-        function recordPayment(studentId, studentName, currentPaid, pendingFee) {
-            if (pendingFee <= 0) { alert(`${studentName} has already paid the full fee!`); return; }
-            const amountStr = prompt(`Recording payment for ${studentName}.\nPending Balance: ₹${pendingFee}\n\nAmount received:`);
+        // =========================================================
+        // REAL-TIME DATA SYNC (The Efficiency Engine)
+        // =========================================================
+        function initRealtimeSync() {
+            const today = new Date().toISOString().split('T')[0];
             
-            if (amountStr !== null && amountStr.trim() !== "") {
-                const amountAdded = parseInt(amountStr);
-                if (isNaN(amountAdded) || amountAdded <= 0) { alert("Please enter a valid number."); return; }
+            // 1. Listen to Today's Attendance
+            db.collection("Attendance").where("date", "==", today).onSnapshot((snapshot) => {
+                markedToday = {};
+                snapshot.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; });
+                if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
+            });
+
+            // 2. Listen to Students Database
+            db.collection("Students").onSnapshot((snapshot) => {
+                allStudents = [];
+                snapshot.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() }));
+                // Sort Alphabetically
+                allStudents.sort((a, b) => a.Name.localeCompare(b.Name));
                 
-                db.collection("Students").doc(studentId).update({ PaidFee: currentPaid + amountAdded })
-                .then(() => { alert(`Success! ₹${amountAdded} recorded for ${studentName}.`); loadData(); })
-                .catch(err => { alert("Error recording payment. Check internet."); });
+                // Update active screens
+                if(document.getElementById('dashboard-screen').classList.contains('active')) renderFolders();
+                if(document.getElementById('directory-screen').classList.contains('active')) renderDirectory();
+                if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
+            });
+        }
+
+        // =========================================================
+        // FOLDER SYSTEM (DASHBOARD)
+        // =========================================================
+        function renderFolders() {
+            const container = document.getElementById('folders-container');
+            container.innerHTML = '';
+
+            // Group students dynamically into { "9th": { "A1": 15, "A2": 10 } }
+            let grouped = {};
+            allStudents.forEach(student => {
+                let c = student.Class || "Unknown";
+                let b = student.Batch || "Unassigned";
+                if(!grouped[c]) grouped[c] = {};
+                if(!grouped[c][b]) grouped[c][b] = 0;
+                grouped[c][b]++;
+            });
+
+            // Standard order for classes if they exist
+            const classOrder = ["8th", "9th", "10th", "Unknown"];
+            
+            classOrder.forEach(cls => {
+                if(grouped[cls]) {
+                    let html = `<div class="class-group"><h3 class="class-title">Class ${cls}</h3><div class="folder-grid">`;
+                    
+                    // Sort batches alphabetically (A1, A2, B1...)
+                    let batches = Object.keys(grouped[cls]).sort();
+                    
+                    batches.forEach(batch => {
+                        let count = grouped[cls][batch];
+                        html += `
+                            <div class="folder-card" onclick="openBatchView('${cls}', '${batch}')">
+                                <i class="fas fa-folder"></i>
+                                <h4>Batch ${batch}</h4>
+                                <p>${count} Students</p>
+                            </div>
+                        `;
+                    });
+                    html += `</div></div>`;
+                    container.innerHTML += html;
+                }
+            });
+
+            if(allStudents.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: #888;">No students found in database.</div>`;
+            }
+        }
+
+        function openBatchView(cls, batch) {
+            currentViewClass = cls;
+            currentViewBatch = batch;
+            document.getElementById('current-batch-title').innerText = `Class ${cls} - Batch ${batch}`;
+            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('batch-screen').classList.add('active');
+            
+            renderBatchList();
+        }
+
+        // =========================================================
+        // BATCH VIEW (ATTENDANCE / FEES)
+        // =========================================================
+        function renderBatchList() {
+            const container = document.getElementById('batch-list-container');
+            container.innerHTML = '';
+            
+            const filtered = allStudents.filter(s => s.Class === currentViewClass && s.Batch === currentViewBatch);
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: #888;">No students in this batch.</div>`;
+                return;
+            }
+
+            filtered.forEach(student => {
+                if (currentBatchMode === 'attendance') {
+                    // Render Attendance UI
+                    let actionHtml = '';
+                    if (markedToday[student.id]) {
+                        const status = markedToday[student.id];
+                        const tagClass = status === 'Present' ? 'tag-present' : 'tag-absent';
+                        actionHtml = `<span class="status-tag ${tagClass}">Marked: ${status}</span>`;
+                    } else {
+                        actionHtml = `
+                            <div class="action-btns">
+                                <button class="btn-present" onclick="markAttendance('${student.id}', '${student.Name}', 'Present')">Present</button>
+                                <button class="btn-absent" onclick="markAttendance('${student.id}', '${student.Name}', 'Absent')">Absent</button>
+                            </div>`;
+                    }
+                    container.innerHTML += `
+                        <div class="card">
+                            <h3 style="margin-bottom: 10px;">${student.Name}</h3>
+                            ${actionHtml}
+                        </div>`;
+                } else {
+                    // Render Fees UI
+                    const totalFee = Number(student.TotalFee) || 0;
+                    const paidFee = Number(student.PaidFee) || 0;
+                    const pendingFee = totalFee - paidFee;
+                    container.innerHTML += `
+                        <div class="card">
+                            <h3 style="margin-bottom: 10px;">${student.Name}</h3>
+                            <div class="fee-stats">
+                                <div><span style="color:#888;">Total</span><span class="fee-val">₹${totalFee}</span></div>
+                                <div><span style="color:#888;">Paid</span><span class="fee-val text-success">₹${paidFee}</span></div>
+                                <div><span style="color:#888;">Pending</span><span class="fee-val text-danger">₹${pendingFee}</span></div>
+                            </div>
+                            <button class="btn-pay" onclick="recordPayment('${student.id}', '${student.Name}', ${paidFee}, ${pendingFee})">Record Payment</button>
+                        </div>`;
+                }
+            });
+        }
+
+        // =========================================================
+        // DIRECTORY (SEARCH, EDIT, DELETE)
+        // =========================================================
+        function renderDirectory() {
+            const container = document.getElementById('directory-list');
+            const query = document.getElementById('search-input').value.toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = allStudents.filter(s => 
+                s.Name.toLowerCase().includes(query) || 
+                (s.Phone && s.Phone.includes(query))
+            );
+
+            filtered.forEach(student => {
+                container.innerHTML += `
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>${student.Name}</h3>
+                            <span class="badge">${student.Class} - ${student.Batch}</span>
+                        </div>
+                        <p style="font-size:0.85rem; color:#666; margin-bottom:10px;"><i class="fas fa-phone"></i> ${student.Phone}</p>
+                        <div class="dir-actions">
+                            <button class="btn-edit" onclick="openEditModal('${student.id}')"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="btn-del" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i> Del</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // =========================================================
+        // ACTIONS (ADD, EDIT, DELETE, ATTENDANCE, FEES)
+        // =========================================================
+        function markAttendance(id, name, status) {
+            const today = new Date().toISOString().split('T')[0];
+            db.collection("Attendance").doc(`${id}_${today}`).set({
+                studentId: id, studentName: name, date: today, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }); // Real-time listener will auto-update the UI
+        }
+
+        function recordPayment(id, name, currentPaid, pending) {
+            if (pending <= 0) { alert(`${name} is fully paid!`); return; }
+            let amt = parseInt(prompt(`Pending: ₹${pending}\nAmount received:`));
+            if (!isNaN(amt) && amt > 0) {
+                db.collection("Students").doc(id).update({ PaidFee: currentPaid + amt });
             }
         }
 
@@ -360,59 +511,74 @@
             const name = document.getElementById('new-name').value.trim();
             const phone = document.getElementById('new-phone').value.trim();
             const cls = document.getElementById('new-class').value;
-            const batch = document.getElementById('new-batch').value;
+            let batch = document.getElementById('new-batch').value.trim().toUpperCase(); // Auto Uppercase
             const total = Number(document.getElementById('new-total').value);
             const paid = Number(document.getElementById('new-paid').value);
 
-            if(!name || !phone) { alert("Name and Phone Number are required!"); return; }
+            if(!name || !phone) { alert("Name and Phone required!"); return; }
+            
+            // SMART BATCH VALIDATION (Must be Letter followed by Number, e.g. A1, B3)
+            if(!/^[A-Z]\d+$/.test(batch)) {
+                alert("Invalid Batch format! Please use a letter followed by a number (e.g., A1, B2, C3).");
+                return;
+            }
 
-            db.collection("Students").add({
-                Name: name, Phone: phone, Class: cls, Batch: batch, TotalFee: total, PaidFee: paid
-            }).then(() => {
-                alert(`Success! ${name} has been enrolled.`);
-                document.getElementById('new-name').value = '';
-                document.getElementById('new-phone').value = '';
-                document.getElementById('new-paid').value = '0';
-                switchTab('attendance');
-            }).catch(error => { alert("Error adding student. Please try again."); });
+            db.collection("Students").add({ Name: name, Phone: phone, Class: cls, Batch: batch, TotalFee: total, PaidFee: paid }).then(() => {
+                alert(`${name} added successfully!`);
+                document.getElementById('new-name').value = ''; document.getElementById('new-phone').value = ''; document.getElementById('new-batch').value = '';
+                switchTab('dashboard');
+            });
         }
 
-        // =========================================================
-        // NEW: TRIPLE-LOCK DELETE FUNCTION
-        // =========================================================
-        function deleteStudent(studentId, studentName) {
-            // Lock 1: Standard Warning
-            if (!confirm(`⚠️ FIRST WARNING:\nAre you sure you want to delete ${studentName}?`)) return;
+        function deleteStudent(id, name) {
+            if(!confirm(`⚠️ Delete ${name}?`)) return;
+            if(prompt(`Type DELETE to confirm removal of ${name}.`) !== "DELETE") return;
+            let pwd = prompt(`Admin Password required to delete:`);
+            if(pwd) {
+                auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(() => {
+                    db.collection("Students").doc(id).delete().then(() => alert(`${name} deleted.`));
+                }).catch(() => alert("❌ Incorrect Password."));
+            }
+        }
 
-            // Lock 2: Type Confirmation
-            let checkWord = prompt(`⚠️ SECOND WARNING:\nType the word DELETE (in all caps) to confirm you want to remove ${studentName}.`);
-            if (checkWord !== "DELETE") {
-                alert("Deletion cancelled.");
+        // EDIT MODAL LOGIC
+        function openEditModal(id) {
+            const student = allStudents.find(s => s.id === id);
+            if(!student) return;
+            
+            document.getElementById('edit-id').value = student.id;
+            document.getElementById('edit-name').value = student.Name;
+            document.getElementById('edit-phone').value = student.Phone;
+            document.getElementById('edit-class').value = student.Class;
+            document.getElementById('edit-batch').value = student.Batch;
+            document.getElementById('edit-total').value = student.TotalFee || 0;
+            document.getElementById('edit-paid').value = student.PaidFee || 0;
+            
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+
+        function closeEditModal() { document.getElementById('edit-modal').style.display = 'none'; }
+
+        function saveEdit() {
+            const id = document.getElementById('edit-id').value;
+            let batch = document.getElementById('edit-batch').value.trim().toUpperCase();
+            
+            if(!/^[A-Z]\d+$/.test(batch)) {
+                alert("Invalid Batch format! Please use a letter followed by a number (e.g., A1).");
                 return;
             }
 
-            // Lock 3: Admin Password Verification
-            let pwd = prompt(`🔐 FINAL SECURITY CHECK:\nEnter your Admin Login Password to permanently delete ${studentName}.`);
-            if (pwd === null || pwd.trim() === "") {
-                alert("Password required. Deletion cancelled.");
-                return;
-            }
-
-            // Verify Password using Firebase Auth
-            const userEmail = auth.currentUser.email;
-            auth.signInWithEmailAndPassword(userEmail, pwd)
-                .then(() => {
-                    // Password correct! Delete the document.
-                    db.collection("Students").doc(studentId).delete().then(() => {
-                        alert(`✅ ${studentName} has been permanently deleted from the database.`);
-                        loadData(); // Refresh the screen
-                    }).catch(err => {
-                        alert("Error deleting student from database. Please check your connection.");
-                    });
-                })
-                .catch(err => {
-                    alert("❌ Incorrect Password. Deletion blocked.");
-                });
+            db.collection("Students").doc(id).update({
+                Name: document.getElementById('edit-name').value,
+                Phone: document.getElementById('edit-phone').value,
+                Class: document.getElementById('edit-class').value,
+                Batch: batch,
+                TotalFee: Number(document.getElementById('edit-total').value),
+                PaidFee: Number(document.getElementById('edit-paid').value)
+            }).then(() => {
+                closeEditModal();
+                alert("Student updated!");
+            });
         }
     </script>
 </body>
