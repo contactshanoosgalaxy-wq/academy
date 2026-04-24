@@ -29,7 +29,13 @@
 
         /* Dashboard Overview */
         .greeting { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
-        .sub-greeting { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
+        .sub-greeting { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
+        
+        /* NEW: Student Notice Board */
+        .notice-card { background: #fffbeb; border-left: 4px solid var(--warning); padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .notice-card i { color: var(--warning); margin-right: 8px; font-size: 1.1rem; }
+        .notice-card p { font-size: 0.9rem; color: #92400e; display: inline; font-weight: 600; }
+
         .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .summary-card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--primary-blue);}
         .summary-card i { font-size: 1.8rem; color: var(--light-blue); margin-bottom: 10px; }
@@ -45,8 +51,18 @@
         .progress-bar-bg { width: 100%; background: #e2e8f0; height: 10px; border-radius: 10px; margin: 15px 0 5px 0; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: var(--success); border-radius: 10px; transition: width 0.5s ease; }
 
-        /* NEW: Netflix-Style Video UI */
-        .folder-title { font-size: 1.1rem; color: #555; margin-bottom: 12px; border-bottom: 2px solid #ddd; padding-bottom: 5px; font-weight: 700; margin-top: 20px;}
+        /* NEW: Nested Folder UI */
+        .folder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .subj-folder { background: white; padding: 25px 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .subj-folder:hover { border-color: var(--primary-blue); transform: translateY(-3px); }
+        .subj-folder i { font-size: 2.5rem; color: #cbd5e1; margin-bottom: 15px; transition: 0.2s; }
+        .subj-folder:hover i { color: var(--light-blue); }
+        .subj-folder h4 { color: var(--text-dark); font-size: 1rem; }
+        .subj-folder p { font-size: 0.75rem; color: #888; margin-top: 5px; font-weight: 600;}
+
+        /* Video List inside Folder */
+        #video-files-view { display: none; }
+        .back-folder-btn { background: #e2e8f0; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; margin-bottom: 15px; }
         .video-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; cursor: pointer; transition: 0.2s;}
         .video-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1);}
         .video-thumb { width: 100%; height: 160px; background-size: cover; background-position: center; position: relative; }
@@ -55,14 +71,14 @@
         .video-info { padding: 15px; }
         .video-info h4 { font-size: 1rem; color: var(--text-dark); margin-bottom: 5px; }
 
-        /* NEW: Cinematic Player Modal */
+        /* Cinematic Player Modal */
         .player-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 999; display: none; flex-direction: column; justify-content: center; }
         .player-header { position: absolute; top: 0; left: 0; width: 100%; padding: 15px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); color: white; z-index: 1000;}
         .player-close { font-size: 1.5rem; cursor: pointer; padding: 5px 15px; }
-        .video-iframe-container { position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 Aspect Ratio */ }
+        .video-iframe-container { position: relative; width: 100%; padding-bottom: 56.25%; }
         .video-iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        /* Bottom Nav - Updated to 5 Tabs (20% width) */
+        /* Bottom Nav - 5 Tabs */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: var(--white); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: none; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 20; }
         .nav-item { text-align: center; color: #888; cursor: pointer; transition: 0.3s; width: 20%;}
         .nav-item i { font-size: 1.2rem; display: block; margin-bottom: 5px; }
@@ -84,7 +100,7 @@
             <div class="login-box">
                 <i class="fas fa-user-graduate"></i>
                 <h2 style="color: var(--primary-blue);">Welcome Back</h2>
-                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Enter your registered WhatsApp number to view your profile.</p>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Enter your credentials to view your profile.</p>
                 <input type="tel" id="phone-input" class="form-control" placeholder="10-digit Phone Number">
                 <input type="password" id="pin-input" class="form-control" placeholder="4-Digit PIN" maxlength="4">
                 <button class="btn" id="login-action-btn" onclick="checkPhone()">Access Portal</button>
@@ -96,6 +112,8 @@
         <div id="dashboard-screen" class="screen">
             <div class="greeting" id="student-greeting">Hey, Student! 👋</div>
             <div class="sub-greeting" id="student-batch">Class - Batch</div>
+
+            <div id="student-notice-board"></div>
 
             <div class="summary-grid">
                 <div class="summary-card" style="border-bottom-color: var(--warning);"><i class="fas fa-calendar-check" style="color: var(--warning);"></i><h3 id="dash-att">--%</h3><p>Attendance</p></div>
@@ -132,11 +150,21 @@
         </div>
 
         <div id="videos-screen" class="screen">
-            <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 5px;"><i class="fas fa-play-circle"></i> Digital Library</h2>
-            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Select a subject folder below to start watching.</p>
-            <div id="videos-list-container">
-                <div class="empty-state"><i class="fas fa-video-slash"></i><p>No videos available for your batch yet.</p></div>
+            
+            <div id="video-folders-view">
+                <h2 style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 5px;"><i class="fas fa-folder-open"></i> Subjects</h2>
+                <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Select a folder to view video lessons.</p>
+                <div id="video-folders-grid" class="folder-grid">
+                    <div class="empty-state" style="grid-column: 1 / -1;"><i class="fas fa-video-slash"></i><p>No subjects available yet.</p></div>
+                </div>
             </div>
+
+            <div id="video-files-view">
+                <button class="back-folder-btn" onclick="closeVideoFolder()"><i class="fas fa-arrow-left"></i> Back to Subjects</button>
+                <h2 id="current-folder-title" style="font-size: 1.2rem; color: var(--primary-blue); margin-bottom: 15px;">Folder Name</h2>
+                <div id="videos-list-container"></div>
+            </div>
+
         </div>
 
         <div id="video-player-modal" class="player-overlay">
@@ -158,14 +186,12 @@
     </div>
 
     <script>
-        // =========================================================
-        // FIREBASE CONFIGURATION
-        // =========================================================
         const firebaseConfig = { apiKey: "AIzaSyDNo7xIyzmcAhOjjnjB5JF2eTiIXY5kfJg", authDomain: "academy-madavoor-portal.firebaseapp.com", projectId: "academy-madavoor-portal", storageBucket: "academy-madavoor-portal.firebasestorage.app", messagingSenderId: "883093460593", appId: "1:883093460593:web:489d90f93fa78eb3e1add0" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         let currentStudent = null;
+        let globalStudentVideos = []; // Stores videos globally for the nested folder logic
 
         window.onload = () => {
             const savedStudent = localStorage.getItem('academyStudentData');
@@ -173,32 +199,27 @@
         };
 
         function checkPhone() {
-    const phone = document.getElementById('phone-input').value.trim(); 
-    const pin = document.getElementById('pin-input').value.trim(); // NEW
-    const errorMsg = document.getElementById('error-msg'); 
-    const btn = document.getElementById('login-action-btn');
-    
-    if (phone.length < 10) return errorMsg.innerText = "Please enter a valid phone number.";
-    if (pin.length < 4) return errorMsg.innerText = "Please enter your 4-digit PIN.";
-    
-    btn.innerText = "Searching..."; errorMsg.innerText = "";
+            const phone = document.getElementById('phone-input').value.trim(); 
+            const pin = document.getElementById('pin-input').value.trim();
+            const errorMsg = document.getElementById('error-msg'); 
+            const btn = document.getElementById('login-action-btn');
+            
+            if (phone.length < 10) return errorMsg.innerText = "Please enter a valid phone number.";
+            if (pin.length < 4) return errorMsg.innerText = "Please enter your 4-digit PIN.";
+            
+            btn.innerText = "Searching..."; errorMsg.innerText = "";
 
-    // The database now requires BOTH the phone and the exact PIN to match
-    db.collection("Students").where("Phone", "==", phone).where("Pin", "==", pin).get().then((snapshot) => {
-        if (snapshot.empty) { 
-            errorMsg.innerText = "Incorrect Phone Number or PIN."; 
-            btn.innerText = "Access Portal"; 
-            return; 
+            db.collection("Students").where("Phone", "==", phone).where("Pin", "==", pin).get().then((snapshot) => {
+                if (snapshot.empty) { errorMsg.innerText = "Incorrect Phone Number or PIN."; btn.innerText = "Access Portal"; return; }
+                let matches = []; snapshot.forEach(doc => matches.push({ id: doc.id, ...doc.data() }));
+                if (matches.length === 1) { loginAs(matches[0]); } 
+                else {
+                    btn.style.display = 'none'; document.getElementById('sibling-selector').style.display = 'block';
+                    let siblingHtml = ''; matches.forEach(student => { siblingHtml += `<button class="btn sibling-btn" onclick='loginAs(${JSON.stringify(student)})'>${student.Name} (${student.Class})</button>`; });
+                    document.getElementById('sibling-buttons').innerHTML = siblingHtml;
+                }
+            }).catch(error => { errorMsg.innerText = "Connection error."; btn.innerText = "Access Portal"; });
         }
-        let matches = []; snapshot.forEach(doc => matches.push({ id: doc.id, ...doc.data() }));
-        if (matches.length === 1) { loginAs(matches[0]); } 
-        else {
-            btn.style.display = 'none'; document.getElementById('sibling-selector').style.display = 'block';
-            let siblingHtml = ''; matches.forEach(student => { siblingHtml += `<button class="btn sibling-btn" onclick='loginAs(${JSON.stringify(student)})'>${student.Name} (${student.Class})</button>`; });
-            document.getElementById('sibling-buttons').innerHTML = siblingHtml;
-        }
-    }).catch(error => { errorMsg.innerText = "Connection error."; btn.innerText = "Access Portal"; });
-}
 
         function loginAs(studentObj) { currentStudent = studentObj; localStorage.setItem('academyStudentData', JSON.stringify(currentStudent)); loadStudentPortal(); }
         function logout() { localStorage.removeItem('academyStudentData'); currentStudent = null; window.location.reload(); }
@@ -208,6 +229,12 @@
             document.getElementById(`${tab}-screen`).classList.add('active');
             const tabMap = { 'dashboard': 0, 'attendance': 1, 'fees': 2, 'exams': 3, 'videos': 4 };
             document.querySelectorAll('.nav-item')[tabMap[tab]].classList.add('active');
+            
+            // If opening Videos tab, ensure it starts on the Folders view
+            if(tab === 'videos') {
+                document.getElementById('video-folders-view').style.display = 'block';
+                document.getElementById('video-files-view').style.display = 'none';
+            }
         }
 
         function loadStudentPortal() {
@@ -221,7 +248,20 @@
             document.getElementById('dash-due').innerText = `₹${pending}`; document.getElementById('fee-total').innerText = `₹${total}`; document.getElementById('fee-paid').innerText = `₹${paid}`; document.getElementById('fee-pending').innerText = `₹${pending}`;
             const feePercent = total > 0 ? Math.round((paid / total) * 100) : 0; document.getElementById('fee-progress').style.width = `${feePercent}%`; document.getElementById('fee-percent-text').innerText = `${feePercent}% Paid`;
 
-            // 2. Fetch Attendance
+            // 2. Fetch Active Notices
+            db.collection("Notices").onSnapshot((snapshot) => {
+                const now = Date.now();
+                let html = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.Expiry > now) {
+                        html += `<div class="notice-card"><i class="fas fa-bullhorn"></i> <p>${data.Message}</p></div>`;
+                    }
+                });
+                document.getElementById('student-notice-board').innerHTML = html;
+            });
+
+            // 3. Fetch Attendance
             db.collection("Attendance").where("studentId", "==", currentStudent.id).onSnapshot((snapshot) => {
                 const listDiv = document.getElementById('attendance-list');
                 if (snapshot.empty) return listDiv.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><h3 style="color: var(--text-dark);">No Records Yet</h3></div>`;
@@ -237,7 +277,7 @@
                 listDiv.innerHTML = itemsHtml; document.getElementById('dash-att').innerText = `${Math.round((presentCount / records.length) * 100)}%`;
             });
 
-            // 3. Fetch Exams
+            // 4. Fetch Exams
             db.collection("Exams").where("Class", "==", currentStudent.Class).where("Batch", "==", currentStudent.Batch).onSnapshot((snapshot) => {
                   const examList = document.getElementById('exams-list');
                   if (!snapshot.empty) {
@@ -250,59 +290,86 @@
                   }
             });
 
-            // 4. NEW: Fetch Videos (Netflix Style)
+            // 5. Fetch Videos (Nested Folder Logic)
             db.collection("Videos").where("Class", "==", currentStudent.Class).where("Batch", "==", currentStudent.Batch).onSnapshot((snapshot) => {
-                const videoList = document.getElementById('videos-list-container');
-                if (snapshot.empty) return videoList.innerHTML = `<div class="empty-state"><i class="fas fa-video-slash"></i><p>No videos available for your batch yet.</p></div>`;
+                const folderGrid = document.getElementById('video-folders-grid');
+                if (snapshot.empty) return folderGrid.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;"><i class="fas fa-video-slash"></i><p>No subjects available yet.</p></div>`;
                 
-                let videos = []; snapshot.forEach(doc => videos.push(doc.data()));
+                globalStudentVideos = []; 
+                snapshot.forEach(doc => globalStudentVideos.push(doc.data()));
                 
-                // Group videos by Folder (Subject)
+                // Extract unique folders and count videos in each
                 let folders = {};
-                videos.forEach(v => {
-                    if(!folders[v.Folder]) folders[v.Folder] = [];
-                    folders[v.Folder].push(v);
+                globalStudentVideos.forEach(v => {
+                    if(!folders[v.Folder]) folders[v.Folder] = 0;
+                    folders[v.Folder]++;
                 });
 
                 let html = '';
                 Object.keys(folders).sort().forEach(folderName => {
-                    html += `<div class="folder-title">${folderName}</div>`;
-                    
-                    // Sort videos in folder by newest first
-                    folders[folderName].sort((a,b)=> b.Timestamp - a.Timestamp).forEach(vid => {
-                        // High quality YouTube thumbnail URL
-                        const thumbUrl = `https://img.youtube.com/vi/${vid.VideoId}/maxresdefault.jpg`;
-                        
-                        html += `
-                        <div class="video-card" onclick="openPlayer('${vid.VideoId}', '${vid.Title.replace(/'/g, "\\'")}')">
-                            <div class="video-thumb" style="background-image: url('${thumbUrl}');">
-                                <div class="video-overlay"><i class="fas fa-play-circle"></i></div>
-                            </div>
-                            <div class="video-info">
-                                <h4>${vid.Title}</h4>
-                            </div>
-                        </div>`;
-                    });
+                    // Safe string escape for onclick function
+                    const safeFolder = folderName.replace(/'/g, "\\'");
+                    html += `
+                        <div class="subj-folder" onclick="openVideoFolder('${safeFolder}')">
+                            <i class="fas fa-folder"></i>
+                            <h4>${folderName}</h4>
+                            <p>${folders[folderName]} Videos</p>
+                        </div>
+                    `;
                 });
-                videoList.innerHTML = html;
+                folderGrid.innerHTML = html;
             });
         }
 
         // =========================================================
-        // VIDEO PLAYER CONTROLS
+        // NESTED VIDEO FOLDER CONTROLS
+        // =========================================================
+        function openVideoFolder(folderName) {
+            document.getElementById('video-folders-view').style.display = 'none';
+            document.getElementById('video-files-view').style.display = 'block';
+            document.getElementById('current-folder-title').innerText = folderName;
+            
+            const container = document.getElementById('videos-list-container');
+            let html = '';
+            
+            // Filter global videos for this specific folder and sort newest first
+            const folderVideos = globalStudentVideos.filter(v => v.Folder === folderName).sort((a,b) => b.Timestamp - a.Timestamp);
+            
+            folderVideos.forEach(vid => {
+                const thumbUrl = `https://img.youtube.com/vi/${vid.VideoId}/maxresdefault.jpg`;
+                html += `
+                <div class="video-card" onclick="openPlayer('${vid.VideoId}', '${vid.Title.replace(/'/g, "\\'")}')">
+                    <div class="video-thumb" style="background-image: url('${thumbUrl}');">
+                        <div class="video-overlay"><i class="fas fa-play-circle"></i></div>
+                    </div>
+                    <div class="video-info">
+                        <h4>${vid.Title}</h4>
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function closeVideoFolder() {
+            document.getElementById('video-files-view').style.display = 'none';
+            document.getElementById('video-folders-view').style.display = 'block';
+            document.getElementById('videos-list-container').innerHTML = ''; // Clean up
+        }
+
+        // =========================================================
+        // CINEMATIC PLAYER CONTROLS
         // =========================================================
         function openPlayer(videoId, title) {
             document.getElementById('player-title').innerText = title;
-            // Clean YouTube embed link to hide branding as much as legally possible
             const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&showinfo=0&fs=1`;
-            
             document.getElementById('iframe-box').innerHTML = `<iframe src="${embedUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
             document.getElementById('video-player-modal').style.display = 'flex';
         }
 
         function closePlayer() {
             document.getElementById('video-player-modal').style.display = 'none';
-            document.getElementById('iframe-box').innerHTML = ''; // Destroy iframe to stop audio
+            document.getElementById('iframe-box').innerHTML = ''; 
         }
     </script>
 </body>
