@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academy Admin | Bulk Data Importer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .upload-box { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 100%; border-top: 5px solid #003b8e; }
+        h2 { color: #003b8e; margin-bottom: 20px; }
+        .file-input { margin: 20px 0; padding: 15px; border: 2px dashed #003b8e; border-radius: 10px; width: 100%; box-sizing: border-box; background: #f8fafc; cursor: pointer; }
+        .btn { background: #003b8e; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
+        .btn:hover { background: #0056d6; }
+        #status { margin-top: 20px; font-weight: bold; color: #10b981; }
+        .error { color: #ef4444 !important; }
+    </style>
+</head>
+<body>
+
+    <div class="upload-box">
+        <h2><i class="fas fa-database"></i> Bulk Student Importer</h2>
+        <p style="color: #666; font-size: 0.9rem;">Upload a .csv file with columns: <b>Name, Phone, Class, Batch, TotalFee, PaidFee</b></p>
+        
+        <input type="file" id="csv-file" class="file-input" accept=".csv">
+        <button class="btn" onclick="startUpload()"><i class="fas fa-cloud-upload-alt"></i> Upload to Firebase</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // =========================================================
+        // YOUR OFFICIAL FIREBASE CONFIGURATION HERE
+        // =========================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNo7xIyzmcAhOjjnjB5JF2eTiIXY5kfJg",
+            authDomain: "academy-madavoor-portal.firebaseapp.com",
+            projectId: "academy-madavoor-portal",
+            storageBucket: "academy-madavoor-portal.firebasestorage.app",
+            messagingSenderId: "883093460593",
+            appId: "1:883093460593:web:489d90f93fa78eb3e1add0"
+        };
+        // =========================================================
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function startUpload() {
+            const fileInput = document.getElementById('csv-file');
+            const statusDiv = document.getElementById('status');
+            
+            if (!fileInput.files.length) {
+                statusDiv.innerText = "Please select a .csv file first!";
+                statusDiv.className = "error";
+                return;
+            }
+
+            statusDiv.innerText = "Reading file...";
+            statusDiv.className = "";
+
+            // Parse the CSV file
+            Papa.parse(fileInput.files[0], {
+                header: true, // Tells the script the first row is column names
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const students = results.data;
+                    statusDiv.innerText = `Found ${students.length} students. Uploading to database...`;
+                    
+                    let uploadCount = 0;
+
+                    // Loop through each row in the Excel sheet and push to Firebase
+                    students.forEach(student => {
+                        db.collection("Students").add({
+                            Name: student.Name || "Unknown",
+                            Phone: String(student.Phone || ""),
+                            Class: student.Class || "",
+                            Batch: student.Batch || "",
+                            TotalFee: Number(student.TotalFee) || 0,
+                            PaidFee: Number(student.PaidFee) || 0
+                        }).then(() => {
+                            uploadCount++;
+                            if (uploadCount === students.length) {
+                                statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> Successfully uploaded ${uploadCount} students!`;
+                            }
+                        }).catch(error => {
+                            console.error("Error adding document: ", error);
+                            statusDiv.innerText = "An error occurred during upload. Check the console.";
+                            statusDiv.className = "error";
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
