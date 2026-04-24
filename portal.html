@@ -44,6 +44,11 @@
         /* Batch View Header */
         .batch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .back-btn { background: #e2e8f0; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; }
+        
+        /* NEW: Date Picker Box */
+        .date-picker-box { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 4px solid var(--primary-blue); }
+        .date-picker-box input { border: 1px solid #ccc; padding: 6px 10px; border-radius: 6px; font-family: inherit; font-weight: 600; color: var(--primary-blue); outline: none; }
+
         .tab-toggles { display: flex; background: #e2e8f0; border-radius: 8px; padding: 4px; margin-bottom: 20px;}
         .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 6px; font-weight: 600; cursor: pointer; color: #555;}
         .tab-btn.active { background: var(--white); color: var(--primary-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -71,7 +76,7 @@
         .tag-present { background: #d1fae5; color: #065f46; }
         .tag-absent { background: #fee2e2; color: #991b1b; }
         
-        /* NEW: History Button */
+        /* History Button */
         .btn-history { width: 100%; background: #e2e8f0; color: #333; border: none; padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.85rem;}
         .btn-history:hover { background: #cbd5e1; }
 
@@ -92,7 +97,7 @@
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto;}
         .modal-close { float: right; cursor: pointer; font-size: 1.2rem; color: #888; }
         
-        /* NEW: History Items inside Modal */
+        /* History Items inside Modal */
         .history-item { display: flex; justify-content: space-between; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; }
         .history-item:last-child { border-bottom: none; }
 
@@ -136,6 +141,11 @@
                 <button class="back-btn" onclick="switchTab('dashboard')"><i class="fas fa-arrow-left"></i> Back</button>
                 <h2 id="current-batch-title" style="font-size: 1.2rem; color: var(--primary-blue); margin: 0 10px;">Class - Batch</h2>
                 <button onclick="deleteCurrentBatch()" style="background: none; border: none; color: var(--danger); font-size: 1.3rem; cursor: pointer; transition: 0.2s;" title="Delete Entire Batch"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            
+            <div class="date-picker-box" id="attendance-date-box">
+                <span style="font-weight: 600; color: #555; font-size: 0.9rem;"><i class="fas fa-calendar-day"></i> View Date:</span>
+                <input type="date" id="view-date" onchange="changeDate()">
             </div>
             
             <div class="tab-toggles">
@@ -278,6 +288,13 @@
         let currentViewClass = '';
         let currentViewBatch = '';
         let currentBatchMode = 'attendance';
+        
+        // NEW: Time Machine Date Tracker
+        let selectedDate = new Date().toISOString().split('T')[0];
+        let attendanceListenerUnsubscribe = null;
+
+        // Set the date picker to today when page loads
+        document.getElementById('view-date').value = selectedDate;
 
         // =========================================================
         // AUTHENTICATION
@@ -293,7 +310,8 @@
                 document.getElementById('logout-btn').style.display = 'block';
                 
                 switchTab('dashboard');
-                initRealtimeSync(); 
+                initRealtimeStudentsSync(); 
+                listenToAttendanceForDate(); // Start listening to the chosen date
             } else {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('login-screen').classList.add('active');
@@ -337,21 +355,17 @@
             currentBatchMode = mode;
             document.getElementById('btn-att').className = `tab-btn ${mode === 'attendance' ? 'active' : ''}`;
             document.getElementById('btn-fee').className = `tab-btn ${mode === 'fees' ? 'active' : ''}`;
+            
+            // Hide date picker if we are looking at fees
+            document.getElementById('attendance-date-box').style.display = (mode === 'attendance') ? 'flex' : 'none';
+            
             renderBatchList();
         }
 
         // =========================================================
-        // REAL-TIME DATA SYNC
+        // REAL-TIME DATA SYNC (TIME MACHINE UPGRADE)
         // =========================================================
-        function initRealtimeSync() {
-            const today = new Date().toISOString().split('T')[0];
-            
-            db.collection("Attendance").where("date", "==", today).onSnapshot((snapshot) => {
-                markedToday = {};
-                snapshot.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; });
-                if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
-            });
-
+        function initRealtimeStudentsSync() {
             db.collection("Students").onSnapshot((snapshot) => {
                 allStudents = [];
                 snapshot.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() }));
@@ -361,6 +375,29 @@
                 if(document.getElementById('directory-screen').classList.contains('active')) renderDirectory();
                 if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
             });
+        }
+
+        // NEW: Dynamic Attendance Listener
+        function listenToAttendanceForDate() {
+            // Stop listening to the old date if we switch dates
+            if (attendanceListenerUnsubscribe) {
+                attendanceListenerUnsubscribe();
+            }
+            
+            // Listen specifically to the date selected in the picker
+            attendanceListenerUnsubscribe = db.collection("Attendance")
+                .where("date", "==", selectedDate)
+                .onSnapshot((snapshot) => {
+                    markedToday = {};
+                    snapshot.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; });
+                    if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList();
+                });
+        }
+
+        // Triggered when user changes the date on the screen
+        function changeDate() {
+            selectedDate = document.getElementById('view-date').value;
+            listenToAttendanceForDate(); // Shift the database radar to the new date!
         }
 
         // =========================================================
@@ -411,6 +448,11 @@
             currentViewBatch = batch;
             document.getElementById('current-batch-title').innerText = `${cls} - ${batch}`;
             
+            // Reset to today when opening a new folder, just to be safe
+            selectedDate = new Date().toISOString().split('T')[0];
+            document.getElementById('view-date').value = selectedDate;
+            changeDate();
+            
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('batch-screen').classList.add('active');
             
@@ -434,8 +476,6 @@
             filtered.forEach(student => {
                 if (currentBatchMode === 'attendance') {
                     let actionHtml = '';
-                    
-                    // The new "View History" button
                     let historyBtn = `<button class="btn-history" onclick="viewHistory('${student.id}', '${student.Name}')"><i class="fas fa-calendar-alt"></i> View History</button>`;
 
                     if (markedToday[student.id]) {
@@ -511,11 +551,10 @@
         // ACTIONS (ADD, EDIT, DELETE, ATTENDANCE, FEES)
         // =========================================================
         function markAttendance(id, name, status) {
-            const today = new Date().toISOString().split('T')[0];
-            db.collection("Attendance").doc(`${id}_${today}`).set({
-                studentId: id, studentName: name, date: today, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            // BACKDATING UPGRADE: Now it saves it under 'selectedDate' instead of 'today'!
+            db.collection("Attendance").doc(`${id}_${selectedDate}`).set({
+                studentId: id, studentName: name, date: selectedDate, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }); 
-            // Note: I removed the SMS hook here so it just cleanly marks attendance.
         }
 
         function recordPayment(id, name, currentPaid, pending) {
@@ -615,7 +654,6 @@
             });
         }
 
-        // NEW: VIEW HISTORY LOGIC
         function viewHistory(studentId, studentName) {
             document.getElementById('history-title').innerText = `${studentName}'s History`;
             const listDiv = document.getElementById('history-list');
@@ -633,8 +671,6 @@
 
                   let records = [];
                   snapshot.forEach(doc => records.push(doc.data()));
-
-                  // Sort dates from newest to oldest
                   records.sort((a, b) => new Date(b.date) - new Date(a.date));
 
                   let presentCount = 0;
@@ -644,7 +680,6 @@
                   records.forEach(data => {
                       if(data.status === 'Present') presentCount++;
                       
-                      // Convert YYYY-MM-DD to a nice format like "24 Apr 2026"
                       const dateObj = new Date(data.date);
                       const dateStr = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
                       const statusColor = data.status === 'Present' ? 'var(--success)' : 'var(--danger)';
@@ -657,7 +692,6 @@
                       `;
                   });
 
-                  // Calculate percentage
                   const percent = Math.round((presentCount / totalCount) * 100);
                   let percentColor = percent >= 75 ? 'var(--success)' : (percent >= 50 ? '#f59e0b' : 'var(--danger)');
 
