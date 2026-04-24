@@ -484,8 +484,32 @@
         // =========================================================
         function markAttendance(id, name, status) {
             const today = new Date().toISOString().split('T')[0];
+            
+            // 1. Save to Firebase
             db.collection("Attendance").doc(`${id}_${today}`).set({
                 studentId: id, studentName: name, date: today, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                
+                // 2. PHASE 2 AUTOMATION: Trigger Webhook only if Absent
+                if (status === 'Absent') {
+                    // Find the student's phone number from our loaded data
+                    const studentData = allStudents.find(s => s.id === id);
+                    const phoneToMessage = studentData ? studentData.Phone : "";
+
+                    // Send data to your Make.com Webhook
+                    fetch("https://hook.eu1.make.com/j3o2zdfn29cu2br3ldca6jttff2l653o", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            studentName: name,
+                            phoneNumber: phoneToMessage,
+                            date: today,
+                            status: "Absent"
+                        })
+                    }).then(() => {
+                        console.log("Alert sent to Make.com for " + name);
+                    }).catch(err => console.error("Webhook error: ", err));
+                }
             }); 
         }
 
