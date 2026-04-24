@@ -490,25 +490,27 @@
                 studentId: id, studentName: name, date: today, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 
-                // 2. PHASE 2 AUTOMATION: Trigger Webhook only if Absent
+                // 2. 100% FREE INSTANT SMS VIA MACRODROID
                 if (status === 'Absent') {
-                    // Find the student's phone number from our loaded data
                     const studentData = allStudents.find(s => s.id === id);
-                    const phoneToMessage = studentData ? studentData.Phone : "";
+                    
+                    if (studentData && studentData.Phone) {
+                        // Ensure India country code (+91) is added
+                        let phoneToMessage = studentData.Phone.length === 10 ? '+91' + studentData.Phone : studentData.Phone;
 
-                    // Send data to your Make.com Webhook
-                    fetch("https://hook.eu1.make.com/j3o2zdfn29cu2br3ldca6jttff2l653o", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            studentName: name,
-                            phoneNumber: phoneToMessage,
-                            date: today,
-                            status: "Absent"
-                        })
-                    }).then(() => {
-                        console.log("Alert sent to Make.com for " + name);
-                    }).catch(err => console.error("Webhook error: ", err));
+                        // =======================================================
+                        // PASTE YOUR MACRODROID DEVICE ID HERE
+                        const deviceID = "YOUR_DEVICE_ID_HERE";
+                        // =======================================================
+                        
+                        // We attach the phone and name directly into the URL
+                        const macroUrl = `https://trigger.macrodroid.com/${deviceID}/absent_alert?phone=${encodeURIComponent(phoneToMessage)}&name=${encodeURIComponent(name)}`;
+
+                        // Send the invisible ping to the phone (no-cors prevents browser blocks)
+                        fetch(macroUrl, { mode: 'no-cors' }).then(() => {
+                            console.log("MacroDroid SMS triggered for " + name);
+                        }).catch(err => console.error("MacroDroid error: ", err));
+                    }
                 }
             }); 
         }
