@@ -50,7 +50,7 @@
         .back-btn { background: #e2e8f0; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; }
         .date-picker-box { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 4px solid var(--primary-blue); }
         .date-picker-box input { border: 1px solid #ccc; padding: 6px 10px; border-radius: 6px; font-family: inherit; font-weight: 600; color: var(--primary-blue); outline: none; }
-        .tab-toggles { display: flex; background: #e2e8f0; border-radius: 8px; padding: 4px; margin-bottom: 20px;}
+        .tab-toggles { display: flex; background: #e2e8f0; border-radius: 8px; padding: 4px; margin-bottom: 15px;}
         .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 6px; font-weight: 600; cursor: pointer; color: #555;}
         .tab-btn.active { background: var(--white); color: var(--primary-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .search-bar { display: flex; background: white; border-radius: 8px; padding: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ddd;}
@@ -72,12 +72,11 @@
         .text-danger { color: var(--danger); } .text-success { color: var(--success); }
         .btn-pay { width: 100%; background: var(--bg-color); color: var(--primary-blue); border: 2px solid var(--primary-blue); padding: 8px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;}
         
-        /* NEW: Staff Management Toggles */
+        /* Staff Management Toggles */
         .staff-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 4px solid #8b5cf6; }
         .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
         .toggle-row:last-child { border-bottom: none; }
         .toggle-label { font-size: 0.9rem; font-weight: 600; color: #555; }
-        /* iOS style toggle */
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
@@ -143,7 +142,15 @@
         <div id="batch-screen" class="screen">
             <div class="batch-header"><button class="back-btn" onclick="switchTab('dashboard')"><i class="fas fa-arrow-left"></i> Back</button><h2 id="current-batch-title" style="font-size: 1.2rem; color: var(--primary-blue); margin: 0 10px;">Class - Batch</h2><button id="delete-batch-btn" onclick="deleteCurrentBatch()" style="background:none;border:none;color:var(--danger);font-size:1.3rem;cursor:pointer;"><i class="fas fa-trash-alt"></i></button></div>
             <div class="date-picker-box" id="attendance-date-box"><span style="font-weight: 600; color: #555; font-size: 0.9rem;"><i class="fas fa-calendar-day"></i> View Date:</span><input type="date" id="view-date" onchange="changeDate()"></div>
+            
             <div class="tab-toggles"><button class="tab-btn active" id="btn-att" onclick="toggleBatchMode('attendance')">Attendance</button><button class="tab-btn" id="btn-fee" onclick="toggleBatchMode('fees')">Fees</button></div>
+            
+            <div id="attendance-filter-box" style="text-align: right; margin-bottom: 15px;">
+                <label style="font-size: 0.85rem; font-weight: 600; color: var(--danger); cursor: pointer; background: #fee2e2; padding: 6px 12px; border-radius: 8px; display: inline-block;">
+                    <input type="checkbox" id="filter-absent" onchange="toggleAbsentFilter()" style="margin-right: 5px;"> <i class="fas fa-filter"></i> Show Absent Only
+                </label>
+            </div>
+
             <div id="batch-list-container"></div>
         </div>
 
@@ -215,10 +222,7 @@
     </div>
 
     <script>
-        // ======================================================================
-        // CHANGE THIS TO YOUR DAD'S EMAIL
-        // ======================================================================
-        const SUPER_ADMIN_EMAIL = "contactshanoosgalaxy@gmail.com"; 
+        const SUPER_ADMIN_EMAIL = "admin@madavoor.com"; 
 
         const firebaseConfig = { apiKey: "AIzaSyDNo7xIyzmcAhOjjnjB5JF2eTiIXY5kfJg", authDomain: "academy-madavoor-portal.firebaseapp.com", projectId: "academy-madavoor-portal", storageBucket: "academy-madavoor-portal.firebasestorage.app", messagingSenderId: "883093460593", appId: "1:883093460593:web:489d90f93fa78eb3e1add0" };
         firebase.initializeApp(firebaseConfig);
@@ -227,19 +231,17 @@
         let allStudents = []; let allExams = []; let allVideos = []; 
         let currentViewClass = ''; let currentViewBatch = ''; let currentBatchMode = 'attendance'; let currentGradingExamId = '';
         let selectedDate = new Date().toISOString().split('T')[0]; let attendanceListenerUnsubscribe = null;
-        let myPermissions = {}; // Stores the logged-in user's permissions
+        let myPermissions = {}; 
+        let showAbsentOnly = false; // NEW: Toggle state for filter
         document.getElementById('view-date').value = selectedDate;
 
         auth.onAuthStateChanged(async user => {
             if (user) {
-                // Determine Roles
                 if (user.email === SUPER_ADMIN_EMAIL) {
-                    // Super Admin gets God Mode
                     myPermissions = { manageStudents: true, manageFees: true, manageExams: true, manageVideos: true, postNotices: true, deleteData: true };
-                    document.getElementById('staff-settings-btn').style.display = 'block'; // Reveal Settings Gear
+                    document.getElementById('staff-settings-btn').style.display = 'block'; 
                     launchApp(user);
                 } else {
-                    // Check Staff Database for restrictions
                     const staffDoc = await db.collection("Staff").doc(user.email).get();
                     if (staffDoc.exists) {
                         myPermissions = staffDoc.data().Permissions;
@@ -258,33 +260,16 @@
         function launchApp(user) {
             document.getElementById('admin-greeting').innerText = `Hey, ${user.email.split('@')[0]}!`;
             document.getElementById('login-screen').classList.remove('active'); document.getElementById('bottom-nav').style.display = 'flex'; document.getElementById('logout-btn').style.display = 'block';
-            
-            applyCloakingDevice(); // Hide restricted features
-            
+            applyCloakingDevice(); 
             switchTab('dashboard'); initRealtimeDataSync(); listenToAttendanceForDate(); 
         }
 
-        // ======================================================================
-        // THE CLOAKING DEVICE (Hides UI based on permissions)
-        // ======================================================================
         function applyCloakingDevice() {
-            if (!myPermissions.manageFees) {
-                document.getElementById('btn-fee').style.display = 'none'; // Batch Fees Tab
-            }
-            if (!myPermissions.manageStudents) {
-                document.getElementById('nav-add-tab').style.display = 'none'; // Bottom Nav Add Student
-                document.getElementById('delete-batch-btn').style.display = 'none'; 
-            }
-            if (!myPermissions.postNotices) {
-                document.getElementById('post-notice-btn-top').style.display = 'none';
-            }
-            if (!myPermissions.manageExams) {
-                document.getElementById('add-exam-btn-top').style.display = 'none';
-                document.getElementById('delete-exam-btn').style.display = 'none';
-            }
-            if (!myPermissions.manageVideos) {
-                document.getElementById('add-vid-btn-top').style.display = 'none';
-            }
+            if (!myPermissions.manageFees) { document.getElementById('btn-fee').style.display = 'none'; }
+            if (!myPermissions.manageStudents) { document.getElementById('nav-add-tab').style.display = 'none'; document.getElementById('delete-batch-btn').style.display = 'none'; }
+            if (!myPermissions.postNotices) { document.getElementById('post-notice-btn-top').style.display = 'none'; }
+            if (!myPermissions.manageExams) { document.getElementById('add-exam-btn-top').style.display = 'none'; document.getElementById('delete-exam-btn').style.display = 'none'; }
+            if (!myPermissions.manageVideos) { document.getElementById('add-vid-btn-top').style.display = 'none'; }
         }
 
         function login() { auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).then(() => { return auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value); }).catch(err => document.getElementById('error-msg').innerText = "Error: " + err.message); }
@@ -301,21 +286,13 @@
             if(tab === 'staff') { fetchAndRenderStaff(); }
         }
 
-        // ======================================================================
-        // STAFF MANAGEMENT LOGIC (Super Admin Only)
-        // ======================================================================
         function addStaffMember() {
             const name = document.getElementById('new-staff-name').value.trim();
             const email = document.getElementById('new-staff-email').value.trim().toLowerCase();
             if(!name || !email) return alert("Enter Name and Email.");
-
             const defaultPerms = { manageStudents: false, manageFees: false, manageExams: false, manageVideos: false, postNotices: false, deleteData: false };
-            
             db.collection("Staff").doc(email).set({ Name: name, Email: email, Permissions: defaultPerms }).then(() => {
-                document.getElementById('new-staff-name').value = '';
-                document.getElementById('new-staff-email').value = '';
-                alert("Staff added! Now adjust their toggles.");
-                fetchAndRenderStaff();
+                document.getElementById('new-staff-name').value = ''; document.getElementById('new-staff-email').value = ''; alert("Staff added! Now adjust their toggles."); fetchAndRenderStaff();
             });
         }
 
@@ -323,20 +300,16 @@
             db.collection("Staff").get().then(snap => {
                 let html = '';
                 snap.forEach(doc => {
-                    const staff = doc.data();
-                    const p = staff.Permissions;
+                    const staff = doc.data(); const p = staff.Permissions;
                     html += `
                     <div class="staff-card">
-                        <h4 style="color: var(--primary-blue); margin-bottom: 5px;">${staff.Name}</h4>
-                        <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">${staff.Email}</p>
-                        
+                        <h4 style="color: var(--primary-blue); margin-bottom: 5px;">${staff.Name}</h4><p style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">${staff.Email}</p>
                         <div class="toggle-row"><span class="toggle-label">Manage Fees (Money)</span><label class="switch"><input type="checkbox" onchange="updateStaffPerm('${staff.Email}', 'manageFees', this.checked)" ${p.manageFees ? 'checked' : ''}><span class="slider"></span></label></div>
                         <div class="toggle-row"><span class="toggle-label">Manage Students (Add/Edit)</span><label class="switch"><input type="checkbox" onchange="updateStaffPerm('${staff.Email}', 'manageStudents', this.checked)" ${p.manageStudents ? 'checked' : ''}><span class="slider"></span></label></div>
                         <div class="toggle-row"><span class="toggle-label">Manage Exams (Create)</span><label class="switch"><input type="checkbox" onchange="updateStaffPerm('${staff.Email}', 'manageExams', this.checked)" ${p.manageExams ? 'checked' : ''}><span class="slider"></span></label></div>
                         <div class="toggle-row"><span class="toggle-label">Manage Videos (Upload)</span><label class="switch"><input type="checkbox" onchange="updateStaffPerm('${staff.Email}', 'manageVideos', this.checked)" ${p.manageVideos ? 'checked' : ''}><span class="slider"></span></label></div>
                         <div class="toggle-row"><span class="toggle-label">Post Notices</span><label class="switch"><input type="checkbox" onchange="updateStaffPerm('${staff.Email}', 'postNotices', this.checked)" ${p.postNotices ? 'checked' : ''}><span class="slider"></span></label></div>
                         <div class="toggle-row"><span class="toggle-label" style="color:var(--danger);">Delete Data Rights</span><label class="switch"><input type="checkbox" onchange="updateStaffPerm('${staff.Email}', 'deleteData', this.checked)" ${p.deleteData ? 'checked' : ''}><span class="slider"></span></label></div>
-                        
                         <button onclick="removeStaff('${staff.Email}')" style="width: 100%; margin-top: 15px; padding: 8px; background: #fee2e2; color: #991b1b; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Remove Staff Member</button>
                     </div>`;
                 });
@@ -344,23 +317,11 @@
             });
         }
 
-        function updateStaffPerm(email, permKey, value) {
-            let updateObj = {};
-            updateObj[`Permissions.${permKey}`] = value;
-            db.collection("Staff").doc(email).update(updateObj);
-        }
-        
-        function removeStaff(email) {
-            if(confirm("Remove this teacher's access to the app?")) {
-                db.collection("Staff").doc(email).delete().then(() => fetchAndRenderStaff());
-            }
-        }
+        function updateStaffPerm(email, permKey, value) { let updateObj = {}; updateObj[`Permissions.${permKey}`] = value; db.collection("Staff").doc(email).update(updateObj); }
+        function removeStaff(email) { if(confirm("Remove this teacher's access to the app?")) { db.collection("Staff").doc(email).delete().then(() => fetchAndRenderStaff()); } }
 
-        // ======================================================================
-        // STANDARD ADMIN APP LOGIC (Protected by Permissions checks)
-        // ======================================================================
         function initRealtimeDataSync() {
-            db.collection("Students").onSnapshot((snap) => { allStudents = []; snap.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() })); allStudents.sort((a,b)=>a.Name.localeCompare(b.Name)); if(document.getElementById('dashboard-screen').classList.contains('active')) renderFolders(); if(document.getElementById('directory-screen').classList.contains('active')) renderDirectory(); if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList(); });
+            db.collection("Students").onSnapshot((snap) => { allStudents = []; snap.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() })); allStudents.sort((a,b)=>a.Name.localeCompare(b.Name)); if(document.getElementById('dashboard-screen').classList.contains('active')) renderFolders(); if(document.getElementById('directory-screen').classList.contains('active')) renderDirectory(); if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList(markedToday); });
             db.collection("Exams").onSnapshot((snap) => { allExams = []; snap.forEach(doc => allExams.push({ id: doc.id, ...doc.data() })); if(document.getElementById('exams-screen').classList.contains('active')) renderExamsList(); });
             db.collection("Videos").onSnapshot((snap) => { allVideos = []; snap.forEach(doc => allVideos.push({ id: doc.id, ...doc.data() })); if(document.getElementById('videos-screen').classList.contains('active')) renderVideosList(); });
             db.collection("Notices").onSnapshot((snap) => { 
@@ -401,12 +362,47 @@
         function saveGrading() { const exam = allExams.find(e => e.id === currentGradingExamId); const studentsInExam = allStudents.filter(s => s.Class === exam.Class && s.Batch === exam.Batch); let newScores = {}; studentsInExam.forEach(student => { const inputVal = document.getElementById(`score-${student.id}`).value.trim(); if (inputVal !== "") newScores[student.id] = inputVal; }); db.collection("Exams").doc(currentGradingExamId).update({ Scores: newScores }).then(() => { alert("Marks Saved!"); switchTab('exams'); }); }
         function deleteExam() { if(!myPermissions.deleteData) return alert("Permission Denied"); if(confirm(`⚠️ Delete Exam completely?`)) { let pwd = prompt(`Password:`); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(() => db.collection("Exams").doc(currentGradingExamId).delete().then(() => switchTab('exams'))).catch(() => alert("❌ Wrong Password.")); } }
         
-        function listenToAttendanceForDate() { let markedToday={}; if(attendanceListenerUnsubscribe) attendanceListenerUnsubscribe(); attendanceListenerUnsubscribe = db.collection("Attendance").where("date", "==", selectedDate).onSnapshot((snap) => { markedToday = {}; snap.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; }); if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList(markedToday); }); }
+        let markedToday = {};
+        function listenToAttendanceForDate() { if(attendanceListenerUnsubscribe) attendanceListenerUnsubscribe(); attendanceListenerUnsubscribe = db.collection("Attendance").where("date", "==", selectedDate).onSnapshot((snap) => { markedToday = {}; snap.forEach(doc => { markedToday[doc.data().studentId] = doc.data().status; }); if(document.getElementById('batch-screen').classList.contains('active')) renderBatchList(markedToday); }); }
         function changeDate() { selectedDate = document.getElementById('view-date').value; listenToAttendanceForDate(); }
+        
+        // NEW: Filter Logic
+        function toggleAbsentFilter() { showAbsentOnly = document.getElementById('filter-absent').checked; renderBatchList(markedToday); }
+
         function renderFolders() { const container = document.getElementById('folders-container'); container.innerHTML = ''; let grouped = {}; allStudents.forEach(s => { let c = s.Class || "Unk"; let b = s.Batch || "Unk"; if(!grouped[c]) grouped[c] = {}; if(!grouped[c][b]) grouped[c][b] = 0; grouped[c][b]++; }); ["8th", "9th", "10th", "Unk"].forEach(cls => { if(grouped[cls]) { let html = `<div class="class-group"><h3 class="class-title">Class ${cls}</h3><div class="folder-grid">`; Object.keys(grouped[cls]).sort().forEach(batch => { html += `<div class="folder-card" onclick="openBatchView('${cls}', '${batch}')"><i class="fas fa-folder"></i><h4>Batch ${batch}</h4><p>${grouped[cls][batch]} Students</p></div>`; }); container.innerHTML += html + `</div></div>`; } }); }
-        function openBatchView(c, b) { currentViewClass = c; currentViewBatch = b; document.getElementById('current-batch-title').innerText = `${c} - ${b}`; selectedDate = new Date().toISOString().split('T')[0]; document.getElementById('view-date').value = selectedDate; changeDate(); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('batch-screen').classList.add('active'); renderBatchList({}); }
-        function toggleBatchMode(m) { currentBatchMode = m; document.getElementById('btn-att').className = `tab-btn ${m==='attendance'?'active':''}`; document.getElementById('btn-fee').className = `tab-btn ${m==='fees'?'active':''}`; document.getElementById('attendance-date-box').style.display = (m === 'attendance') ? 'flex' : 'none'; listenToAttendanceForDate(); }
-        function renderBatchList(markedList) { const container = document.getElementById('batch-list-container'); container.innerHTML = ''; const filtered = allStudents.filter(s => s.Class === currentViewClass && s.Batch === currentViewBatch); filtered.forEach(student => { if (currentBatchMode === 'attendance') { let btn = `<button class="btn-history" onclick="viewHistory('${student.id}', '${student.Name}')"><i class="fas fa-calendar-alt"></i> History</button>`; if (markedList[student.id]) { container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div style="text-align:center;"><span class="status-tag ${markedList[student.id]==='Present'?'tag-present':'tag-absent'}">Marked: ${markedList[student.id]}</span>${btn}</div></div>`; } else { container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="action-btns"><button class="btn-present" onclick="markAttendance('${student.id}', '${student.Name}', 'Present')">Present</button><button class="btn-absent" onclick="markAttendance('${student.id}', '${student.Name}', 'Absent')">Absent</button></div>${btn}</div>`; } } else { const t = Number(student.TotalFee) || 0; const p = Number(student.PaidFee) || 0; const pend = t - p; container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="fee-stats"><div><span style="color:#888;">Total</span><span class="fee-val">₹${t}</span></div><div><span style="color:#888;">Paid</span><span class="fee-val text-success">₹${p}</span></div><div><span style="color:#888;">Pending</span><span class="fee-val text-danger">₹${pend}</span></div></div><button class="btn-pay" onclick="recordPayment('${student.id}', '${student.Name}', ${p}, ${pend})">Record Payment</button></div>`; } }); }
+        function openBatchView(c, b) { currentViewClass = c; currentViewBatch = b; document.getElementById('current-batch-title').innerText = `${c} - ${b}`; selectedDate = new Date().toISOString().split('T')[0]; document.getElementById('view-date').value = selectedDate; changeDate(); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('batch-screen').classList.add('active'); renderBatchList(markedToday); }
+        function toggleBatchMode(m) { currentBatchMode = m; document.getElementById('btn-att').className = `tab-btn ${m==='attendance'?'active':''}`; document.getElementById('btn-fee').className = `tab-btn ${m==='fees'?'active':''}`; document.getElementById('attendance-date-box').style.display = (m === 'attendance') ? 'flex' : 'none'; document.getElementById('attendance-filter-box').style.display = (m === 'attendance') ? 'block' : 'none'; listenToAttendanceForDate(); }
+        
+        function renderBatchList(markedList) { 
+            const container = document.getElementById('batch-list-container'); 
+            container.innerHTML = ''; 
+            const filtered = allStudents.filter(s => s.Class === currentViewClass && s.Batch === currentViewBatch); 
+            
+            filtered.forEach(student => { 
+                if (currentBatchMode === 'attendance') { 
+                    
+                    // NEW: Filter absent students
+                    if (showAbsentOnly && markedList[student.id] !== 'Absent') return; 
+
+                    let btn = `<button class="btn-history" onclick="viewHistory('${student.id}', '${student.Name}')"><i class="fas fa-calendar-alt"></i> History</button>`; 
+                    // NEW: Phone number added to attendance card
+                    let phoneHtml = `<p style="font-size:0.8rem; color:#666; margin-bottom:10px;"><i class="fas fa-phone"></i> ${student.Phone}</p>`;
+                    
+                    if (markedList[student.id]) { 
+                        container.innerHTML += `<div class="card"><h3 style="margin-bottom:5px;">${student.Name}</h3>${phoneHtml}<div style="text-align:center;"><span class="status-tag ${markedList[student.id]==='Present'?'tag-present':'tag-absent'}">Marked: ${markedList[student.id]}</span>${btn}</div></div>`; 
+                    } else { 
+                        container.innerHTML += `<div class="card"><h3 style="margin-bottom:5px;">${student.Name}</h3>${phoneHtml}<div class="action-btns"><button class="btn-present" onclick="markAttendance('${student.id}', '${student.Name}', 'Present')">Present</button><button class="btn-absent" onclick="markAttendance('${student.id}', '${student.Name}', 'Absent')">Absent</button></div>${btn}</div>`; 
+                    } 
+                } else { 
+                    const t = Number(student.TotalFee) || 0; const p = Number(student.PaidFee) || 0; const pend = t - p; 
+                    container.innerHTML += `<div class="card"><h3 style="margin-bottom:10px;">${student.Name}</h3><div class="fee-stats"><div><span style="color:#888;">Total</span><span class="fee-val">₹${t}</span></div><div><span style="color:#888;">Paid</span><span class="fee-val text-success">₹${p}</span></div><div><span style="color:#888;">Pending</span><span class="fee-val text-danger">₹${pend}</span></div></div><button class="btn-pay" onclick="recordPayment('${student.id}', '${student.Name}', ${p}, ${pend})">Record Payment</button></div>`; 
+                } 
+            }); 
+            
+            if (container.innerHTML === '') {
+                container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No students match this filter.</div>`;
+            }
+        }
         
         function renderDirectory() { const container = document.getElementById('directory-list'); const query = document.getElementById('search-input').value.toLowerCase(); container.innerHTML = ''; if(query === "") { container.innerHTML = `<div style="text-align: center; color: #888; padding: 40px 20px;"><i class="fas fa-search" style="font-size: 2rem; margin-bottom:10px; color:#ccc;"></i><br>Type a name or phone number to search.</div>`; return; } const filtered = allStudents.filter(s => s.Name.toLowerCase().includes(query) || (s.Phone && s.Phone.includes(query))).slice(0, 20); if(filtered.length === 0) { container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No students found.</div>`; return; } filtered.forEach(student => { let editBtn = myPermissions.manageStudents ? `<button class="btn-edit" onclick="openEditModal('${student.id}')"><i class="fas fa-edit"></i> Edit</button>` : ''; let delBtn = myPermissions.deleteData ? `<button class="btn-del" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i> Del</button>` : ''; container.innerHTML += `<div class="card"><div class="card-header"><h3>${student.Name}</h3><span class="badge">${student.Class} - ${student.Batch}</span></div><p style="font-size:0.85rem; color:#666; margin-bottom:10px;"><i class="fas fa-phone"></i> ${student.Phone} &nbsp;|&nbsp; <i class="fas fa-key"></i> PIN: <strong style="color:var(--danger);">${student.Pin || 'N/A'}</strong></p><div class="dir-actions">${editBtn}${delBtn}</div></div>`; }); }
         function markAttendance(id, name, status) { db.collection("Attendance").doc(`${id}_${selectedDate}`).set({ studentId: id, studentName: name, date: selectedDate, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); }
