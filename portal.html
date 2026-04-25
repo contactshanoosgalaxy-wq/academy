@@ -404,7 +404,45 @@
             }
         }
         
-        function renderDirectory() { const container = document.getElementById('directory-list'); const query = document.getElementById('search-input').value.toLowerCase(); container.innerHTML = ''; if(query === "") { container.innerHTML = `<div style="text-align: center; color: #888; padding: 40px 20px;"><i class="fas fa-search" style="font-size: 2rem; margin-bottom:10px; color:#ccc;"></i><br>Type a name or phone number to search.</div>`; return; } const filtered = allStudents.filter(s => s.Name.toLowerCase().includes(query) || (s.Phone && s.Phone.includes(query))).slice(0, 20); if(filtered.length === 0) { container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No students found.</div>`; return; } filtered.forEach(student => { let editBtn = myPermissions.manageStudents ? `<button class="btn-edit" onclick="openEditModal('${student.id}')"><i class="fas fa-edit"></i> Edit</button>` : ''; let delBtn = myPermissions.deleteData ? `<button class="btn-del" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i> Del</button>` : ''; container.innerHTML += `<div class="card"><div class="card-header"><h3>${student.Name}</h3><span class="badge">${student.Class} - ${student.Batch}</span></div><p style="font-size:0.85rem; color:#666; margin-bottom:10px;"><i class="fas fa-phone"></i> ${student.Phone} &nbsp;|&nbsp; <i class="fas fa-key"></i> PIN: <strong style="color:var(--danger);">${student.Pin || 'N/A'}</strong></p><div class="dir-actions">${editBtn}${delBtn}</div></div>`; }); }
+       function renderDirectory() { 
+    const container = document.getElementById('directory-list'); 
+    
+    // Added .trim() to ignore accidental spaces
+    const query = document.getElementById('search-input').value.trim().toLowerCase(); 
+    container.innerHTML = ''; 
+    
+    // THE FIX: If the search box is completely empty, STOP here and show the prompt.
+    if(query === "") { 
+        container.innerHTML = `<div style="text-align: center; color: #888; padding: 40px 20px;"><i class="fas fa-search" style="font-size: 2rem; margin-bottom:10px; color:#ccc;"></i><br>Type a name or phone number to search.</div>`; 
+        return; 
+    } 
+    
+    // Limits results to 20 to prevent freezing
+    const filtered = allStudents.filter(s => s.Name.toLowerCase().includes(query) || (s.Phone && s.Phone.includes(query))).slice(0, 20); 
+    
+    if(filtered.length === 0) { 
+        container.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">No students found.</div>`; 
+        return; 
+    } 
+    
+    filtered.forEach(student => { 
+        let editBtn = myPermissions.manageStudents ? `<button class="btn-edit" onclick="openEditModal('${student.id}')"><i class="fas fa-edit"></i> Edit</button>` : ''; 
+        let delBtn = myPermissions.deleteData ? `<button class="btn-del" onclick="deleteStudent('${student.id}', '${student.Name}')"><i class="fas fa-trash"></i> Del</button>` : ''; 
+        
+        container.innerHTML += `
+        <div class="card">
+            <div class="card-header">
+                <h3>${student.Name}</h3>
+                <span class="badge">${student.Class} - ${student.Batch}</span>
+            </div>
+            <p style="font-size:0.85rem; color:#666; margin-bottom:10px;">
+                <i class="fas fa-phone"></i> ${student.Phone} &nbsp;|&nbsp; 
+                <i class="fas fa-key"></i> PIN: <strong style="color:var(--danger);">${student.Pin || 'N/A'}</strong>
+            </p>
+            <div class="dir-actions">${editBtn}${delBtn}</div>
+        </div>`; 
+    }); 
+}
         function markAttendance(id, name, status) { db.collection("Attendance").doc(`${id}_${selectedDate}`).set({ studentId: id, studentName: name, date: selectedDate, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); }
         function recordPayment(id, name, cPaid, pending) { if(!myPermissions.manageFees) return alert("Permission Denied"); if(pending<=0) return alert("Fully paid!"); let amt = parseInt(prompt(`Pending: ₹${pending}\nAmount:`)); if(!isNaN(amt) && amt>0) db.collection("Students").doc(id).update({ PaidFee: cPaid + amt }); }
         function addNewStudent() { if(!myPermissions.manageStudents) return alert("Permission Denied"); const n = document.getElementById('new-name').value.trim(); const p = document.getElementById('new-phone').value.trim(); const pin = document.getElementById('new-pin').value.trim(); const c = document.getElementById('new-class').value; let b = document.getElementById('new-batch').value.trim().toUpperCase(); const t = Number(document.getElementById('new-total').value); const pd = Number(document.getElementById('new-paid').value); if(!n || !p || !pin) return alert("Missing fields"); if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch"); db.collection("Students").add({ Name: n, Phone: p, Pin: pin, Class: c, Batch: b, TotalFee: t, PaidFee: pd }).then(() => { alert("Added!"); document.getElementById('new-name').value=''; document.getElementById('new-phone').value=''; document.getElementById('new-pin').value=''; document.getElementById('new-batch').value=''; switchTab('dashboard'); }); }
