@@ -443,7 +443,38 @@
         </div>`; 
     }); 
 }
-        function markAttendance(id, name, status) { db.collection("Attendance").doc(`${id}_${selectedDate}`).set({ studentId: id, studentName: name, date: selectedDate, status: status, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); }
+        function markAttendance(id, name, status) { 
+    // 1. Save to Firebase just like before
+    db.collection("Attendance").doc(`${id}_${selectedDate}`).set({ 
+        studentId: id, 
+        studentName: name, 
+        date: selectedDate, 
+        status: status, 
+        timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+    }).then(() => {
+        // 2. The Make.com Webhook Trigger
+        if (status === 'Absent') {
+            // Find the student's phone number from your data array
+            const studentDataObj = allStudents.find(s => s.id === id);
+            const phoneNum = studentDataObj ? studentDataObj.Phone : "";
+
+            // PASTE YOUR MAKE.COM WEBHOOK URL HERE:
+            const makeWebhookUrl = "https://hook.eu1.make.com/8oqcvprm26332caw554fx6gxlx9lgzab";
+            
+            const payload = {
+                name: name,
+                phone: phoneNum,
+                date: selectedDate
+            };
+
+            fetch(makeWebhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => console.log("Sent to Make.com successfully!"));
+        }
+    }); 
+}
         function recordPayment(id, name, cPaid, pending) { if(!myPermissions.manageFees) return alert("Permission Denied"); if(pending<=0) return alert("Fully paid!"); let amt = parseInt(prompt(`Pending: ₹${pending}\nAmount:`)); if(!isNaN(amt) && amt>0) db.collection("Students").doc(id).update({ PaidFee: cPaid + amt }); }
         function addNewStudent() { if(!myPermissions.manageStudents) return alert("Permission Denied"); const n = document.getElementById('new-name').value.trim(); const p = document.getElementById('new-phone').value.trim(); const pin = document.getElementById('new-pin').value.trim(); const c = document.getElementById('new-class').value; let b = document.getElementById('new-batch').value.trim().toUpperCase(); const t = Number(document.getElementById('new-total').value); const pd = Number(document.getElementById('new-paid').value); if(!n || !p || !pin) return alert("Missing fields"); if(!/^[A-Z]\d+$/.test(b)) return alert("Invalid Batch"); db.collection("Students").add({ Name: n, Phone: p, Pin: pin, Class: c, Batch: b, TotalFee: t, PaidFee: pd }).then(() => { alert("Added!"); document.getElementById('new-name').value=''; document.getElementById('new-phone').value=''; document.getElementById('new-pin').value=''; document.getElementById('new-batch').value=''; switchTab('dashboard'); }); }
         function deleteStudent(id, name) { if(!myPermissions.deleteData) return alert("Permission Denied"); if(prompt(`Type DELETE to confirm ${name}`)==="DELETE") { let pwd = prompt("Admin Password:"); if(pwd) auth.signInWithEmailAndPassword(auth.currentUser.email, pwd).then(()=>db.collection("Students").doc(id).delete().then(()=>alert("Deleted"))).catch(()=>alert("Wrong Password")); } }
