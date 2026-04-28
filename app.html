@@ -3,45 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Academy">
-
-<link rel="apple-touch-icon" href="icon-180.png">
-    <title>Academy Gatekeeper</title>
-    <link rel="manifest" href="manifest.json">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Academy">
-
-<link rel="apple-touch-icon" href="icon-180.png">
-
-<meta name="theme-color" content="#003b8e">
+    <title>Academy Madavoor</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #f4f7f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: 'Poppins', sans-serif; }
-        .container { text-align: center; width: 90%; max-width: 400px; }
-        .logo { font-size: 1.5rem; font-weight: 800; color: #003b8e; margin-bottom: 30px; letter-spacing: 2px; }
-        .choice-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; cursor: pointer; transition: 0.3s; border: 2px solid transparent; text-decoration: none; display: block; }
-        .choice-card:hover { border-color: #003b8e; transform: translateY(-5px); }
-        .choice-card i { font-size: 2.5rem; color: #0056d6; margin-bottom: 15px; }
-        .choice-card h3 { margin: 0; color: #1a2a3a; }
+        body { background: #ffffff; font-family: 'Poppins', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .main-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .logo { width: 120px; margin-bottom: 20px; }
+        h2 { color: #003b8e; margin-bottom: 10px; }
+        p { color: #666; text-align: center; margin-bottom: 30px; }
+        
+        .btn-student { 
+            background: #003b8e; color: white; padding: 15px 40px; 
+            border-radius: 30px; text-decoration: none; font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,59,142,0.3); width: 80%; text-align: center;
+        }
+
+        footer { padding: 20px; text-align: center; border-top: 1px solid #eee; }
+        .staff-link { color: #aaa; text-decoration: none; font-size: 0.8rem; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">ACADEMY MADAVOOR</div>
+    <div class="main-content">
+        <img src="icon-180.png" class="logo" alt="Academy Logo">
+        <h2>Welcome Back!</h2>
+        <p>Access your classes, exams, and attendance records.</p>
         
-        <a href="student.html" class="choice-card">
-            <i class="fas fa-user-graduate"></i>
-            <h3>Student Portal</h3>
-        </a>
-
-        <a href="portal.html" class="choice-card">
-            <i class="fas fa-user-shield"></i>
-            <h3>Staff Portal</h3>
-        </a>
+        <a href="student.html" class="btn-student">STUDENT LOGIN</a>
     </div>
+
+    <footer>
+        <a href="portal.html" class="staff-link">STAFF ADMINISTRATION</a>
+    </footer>
 </body>
 </html>
