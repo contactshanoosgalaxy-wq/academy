@@ -288,7 +288,7 @@
             if (!myPermissions.manageVideos) { document.getElementById('add-vid-btn-top').style.display = 'none'; }
         }
 
-        function login() { auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).then(() => { return auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value); }).catch(err => document.getElementById('error-msg').innerText = "Error: " + err.message); }
+        function login() { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => { return auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value); }).catch(err => document.getElementById('error-msg').innerText = "Error: " + err.message); }
         function logout() { auth.signOut(); }
 
         function switchTab(tab) {
