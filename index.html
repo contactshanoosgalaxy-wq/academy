@@ -4,20 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Academy">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Academy">
 
-<link rel="apple-touch-icon" href="icon-180.png">
+    <link rel="apple-touch-icon" href="icon-180.png">
     <title>Academy Madavoor | Since 1996</title>
     <link rel="manifest" href="manifest.json">
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Academy">
-
-<link rel="apple-touch-icon" href="icon-180.png">
-
-<meta name="theme-color" content="#003b8e">
+    <meta name="theme-color" content="#003b8e">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
@@ -44,15 +38,45 @@
             border-bottom: 1px solid rgba(255,255,255,0.5);
         }
 
-        .nav-logo { font-size: clamp(1.2rem, 3vw, 1.6rem); font-weight: 800; color: var(--primary-blue); text-decoration: none; letter-spacing: 1px; text-transform: uppercase;}
+        /* LOGO STYLES */
+        .nav-logo { 
+            display: flex; align-items: center;
+            font-size: clamp(1.2rem, 3vw, 1.6rem); font-weight: 800; color: var(--primary-blue); 
+            text-decoration: none; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .logo-img {
+            height: 40px; width: auto; margin-right: 12px; border-radius: 4px;
+        }
+
         .nav-menu { display: flex; align-items: center; gap: 30px; }
         .nav-links { display: flex; gap: 30px; list-style: none; }
         .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; transition: color 0.3s ease; }
         .nav-links a:hover { color: var(--light-blue); }
-        .nav-socials { display: flex; gap: 15px; }
-        .nav-socials a { color: var(--primary-blue); font-size: 1.4rem; transition: transform 0.3s ease, color 0.3s ease; }
-        .nav-socials a:hover { transform: scale(1.2) translateY(-3px); color: var(--light-blue); }
+        .nav-socials { display: flex; align-items: center; gap: 15px; }
+        .nav-socials a.icon-link { color: var(--primary-blue); font-size: 1.4rem; transition: transform 0.3s ease, color 0.3s ease; }
+        .nav-socials a.icon-link:hover { transform: scale(1.2) translateY(-3px); color: var(--light-blue); }
         .menu-btn { display: none; font-size: 1.8rem; color: var(--primary-blue); cursor: pointer; }
+
+        /* UPGRADED STUDENT LOGIN BUTTON */
+        .btn-student-login {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: var(--white) !important;
+            padding: 10px 22px;
+            border-radius: 25px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-left: 10px;
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-student-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(234, 88, 12, 0.5);
+        }
 
         /* Hero Section */
         .hero {
@@ -135,11 +159,11 @@
         .form-control:focus { outline: none; border-color: var(--light-blue); background: var(--white); box-shadow: 0 10px 20px rgba(0,86,214,0.1); transform: translateY(-2px);}
         
         .submit-btn { 
-            background: linear-gradient(135deg, var(--light-blue), var(--primary-blue)); color: var(--white); 
+            background: linear-gradient(135deg, #10b981, #059669); color: var(--white); 
             padding: 16px; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: 700; 
             cursor: pointer; width: 100%; transition: 0.2s; margin-top: 15px;
-            box-shadow: 0 10px 20px rgba(0,45,114,0.3), 0 6px 0 var(--dark-blue);
-            position: relative; top: 0;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3), 0 6px 0 #047857;
+            position: relative; top: 0; display: flex; justify-content: center; align-items: center; gap: 10px;
         }
         .submit-btn:active { top: 6px; box-shadow: 0 0 0 transparent; }
 
@@ -183,12 +207,13 @@
             }
             .nav-menu.active { left: 0; }
             .nav-links { flex-direction: column; gap: 25px; text-align: center; width: 100%; padding-bottom: 25px; border-bottom: 1px solid #eee; font-size: 1.2rem;}
-            .nav-socials { justify-content: center; width: 100%; padding-top: 20px; }
+            .nav-socials { justify-content: center; width: 100%; padding-top: 20px; flex-wrap: wrap;}
             .form-row { grid-template-columns: 1fr; gap: 15px; } 
             .form-container { padding: 30px 20px; }
             .section { padding: 40px 5%; }
             .cards-container { gap: 25px; }
             .stats-strip { transform: translateY(-20px); gap: 20px; flex-direction: column;}
+            .btn-student-login { margin-top: 10px; width: 80%; justify-content: center; }
         }
     </style>
 </head>
@@ -200,18 +225,21 @@
 </div>
 
 <script>
-    // Hide splash screen when the page and Firebase data are ready
     window.addEventListener('load', function() {
         setTimeout(() => {
             const splash = document.getElementById('app-splash');
             splash.style.opacity = '0';
             setTimeout(() => splash.style.display = 'none', 500);
-        }, 1500); // 1.5 second beautiful delay
+        }, 1500); 
     });
 </script>
 
     <nav class="navbar">
-        <a href="#" class="nav-logo">ACADEMY MADAVOOR</a>
+        <a href="#" class="nav-logo">
+            <!-- Upload your logo image to github and name it exactly 'logo.png' -->
+            <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+            ACADEMY MADAVOOR
+        </a>
         <i class="fas fa-bars menu-btn" id="menuBtn"></i>
 
         <div class="nav-menu" id="navMenu">
@@ -222,13 +250,13 @@
                 <li><a href="#branches" class="nav-link-item">Branches</a></li>
             </ul>
            <div class="nav-socials">
-            <a href="https://instagram.com/_academy_madavoor_" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="https://wa.me/919446646591" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://instagram.com/_academy_madavoor_" target="_blank" class="icon-link"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/919446646591" target="_blank" class="icon-link"><i class="fab fa-whatsapp"></i></a>
             
-            <a href="portal.html" title="Staff Login"><i class="fas fa-user-shield"></i></a>
+            <a href="portal.html" title="Staff Login" class="icon-link"><i class="fas fa-user-shield"></i></a>
             
-            <a href="student.html" style="background: white; color: #003b8e; padding: 8px 15px; border-radius: 20px; font-weight: 700; text-decoration: none; font-size: 0.9rem; margin-left: 10px;">
-                Student Login
+            <a href="student.html" class="btn-student-login">
+                <i class="fas fa-user-graduate"></i> Student Login
             </a>
         </div>
         </div>
@@ -241,9 +269,9 @@
         <div class="shape shape4"></div>
         
         <div class="hero-content">
-            <h1>START EARLY.<br>FINISH STRONG.</h1>
+            <h1>EXCELLENCE IN<br>EDUCATION.</h1>
             <p>Empowering State Syllabus Students Since 1996.</p>
-            <a href="#admission" class="btn">Join Our Foundation Batch</a>
+            <a href="#admission" class="btn">Enroll Now</a>
         </div>
     </section>
 
@@ -270,10 +298,11 @@
                 <h3>State Syllabus</h3>
                 <p>Focused, high-quality tuition specifically structured for Kerala State Syllabus students to master their textbooks.</p>
             </div>
+            <!-- Updated 3D Card -->
             <div class="tilt-card" data-tilt>
-                <i class="fas fa-users"></i>
-                <h3>Bridge Classes</h3>
-                <p>Building strong foundations. Join our newly started batches to master the basics before the chapters begin.</p>
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h3>Expert Mentorship</h3>
+                <p>Learn from highly experienced faculty dedicated to ensuring deep conceptual clarity and academic success.</p>
             </div>
             <div class="tilt-card" data-tilt>
                 <i class="fas fa-award"></i>
@@ -287,17 +316,18 @@
         <h2 class="section-title">Student Registration</h2>
         <div class="form-container">
             
-            <form id="studentDataForm" action="https://docs.google.com/forms/d/e/1FAIpQLSfKgNbbVJnAgd8f88Ozozsg6HOKlMnb9-siuTjP2xFA6BW8Zg/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true; alert('Registration received! We will contact you shortly on WhatsApp.');">
+            <!-- Upgraded WhatsApp Form -->
+            <form id="studentDataForm" onsubmit="sendToWhatsApp(event)">
                 
                 <div class="form-row">
-                    <div class="form-group"><input type="text" name="entry.1677182329" class="form-control" placeholder="Student Full Name" required></div>
-                    <div class="form-group"><input type="tel" name="entry.1939491275" class="form-control" placeholder="WhatsApp Number" required></div>
+                    <div class="form-group"><input type="text" id="waName" class="form-control" placeholder="Student Full Name" required></div>
+                    <div class="form-group"><input type="tel" id="waPhone" class="form-control" placeholder="WhatsApp Number" required></div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group"><input type="text" name="entry.896595138" class="form-control" placeholder="School Name" required></div>
+                    <div class="form-group"><input type="text" id="waSchool" class="form-control" placeholder="School Name" required></div>
                     <div class="form-group">
-                        <select name="entry.939474810" class="form-control" required>
+                        <select id="waClass" class="form-control" required>
                             <option value="" disabled selected>Select Class</option>
                             <option value="8th">Class 8</option>
                             <option value="9th">Class 9</option>
@@ -307,7 +337,7 @@
                 </div>
 
                 <div class="form-group">
-                    <select name="entry.1260290967" class="form-control" required>
+                    <select id="waBranch" class="form-control" required>
                         <option value="" disabled selected>Select Preferred Branch</option>
                         <option value="Chakkalakal">Chakkalakal</option>
                         <option value="Narikkuni">Narikkuni</option>
@@ -315,11 +345,36 @@
                     </select>
                 </div>
 
-                <button type="submit" class="submit-btn">Secure Admission</button>
+                <button type="submit" class="submit-btn"><i class="fab fa-whatsapp"></i> Secure Admission</button>
             </form>
-            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location='#';}"></iframe>
-            <script>var submitted=false;</script>
-            </div>
+
+            <script>
+                // Function to compile the form data and open WhatsApp
+                function sendToWhatsApp(event) {
+                    event.preventDefault(); // Prevents the page from reloading
+
+                    const name = document.getElementById('waName').value;
+                    const phone = document.getElementById('waPhone').value;
+                    const school = document.getElementById('waSchool').value;
+                    const studentClass = document.getElementById('waClass').value;
+                    const branch = document.getElementById('waBranch').value;
+
+                    // Formats the text for WhatsApp
+                    const whatsappMessage = `*New Admission Inquiry*\n\n*Student Name:* ${name}\n*WhatsApp Number:* ${phone}\n*School:* ${school}\n*Class:* ${studentClass}\n*Preferred Branch:* ${branch}\n\nWe would like to secure an admission.`;
+
+                    // Encodes the message to safely put it in a URL
+                    const encodedMessage = encodeURIComponent(whatsappMessage);
+                    
+                    // The Dad's Phone Number
+                    const targetPhoneNumber = "919446646591"; 
+
+                    // Opens WhatsApp in a new tab/app
+                    const whatsappUrl = `https://wa.me/${targetPhoneNumber}?text=${encodedMessage}`;
+                    window.open(whatsappUrl, '_blank');
+                }
+            </script>
+            
+        </div>
     </section>
 
     <section class="section" id="branches">
