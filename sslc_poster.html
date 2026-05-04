@@ -146,8 +146,34 @@
         function triggerDownloadPoster() {
             const nameToUse = document.getElementById('studentName').value || 'Student';
             const sanitizedName = nameToUse.replace(/\s+/g, '_');
+            const fileName = sanitizedName + '_SSLC_2026.png';
+
+            // iOS Native Share Menu Trick
+            if (navigator.canShare && navigator.share) {
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], fileName, { type: "image/png" });
+                    
+                    // If the phone supports sharing files directly (iPhones do this well)
+                    if (navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: nameToUse + ' A+ Poster'
+                        }).catch((error) => console.log('User closed share menu', error));
+                    } else {
+                        // Fallback
+                        forceStandardDownload(fileName); 
+                    }
+                });
+            } else {
+                // Fallback for PC and older Androids
+                forceStandardDownload(fileName); 
+            }
+        }
+
+        // The original standard download method (kept here as a backup)
+        function forceStandardDownload(fileName) {
             const link = document.createElement('a');
-            link.download = sanitizedName + '_SSLC_2026.png';
+            link.download = fileName;
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
