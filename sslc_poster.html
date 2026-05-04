@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academy Madavoor | SSLC A+ Poster Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap');
+        
+        body { font-family: 'Poppins', sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        h2 { color: #003b8e; text-align: center; margin-bottom: 25px; }
+        
+        .main-generator-box { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; max-width: 1200px; width: 100%; }
+        
+        .controls-panel { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); width: 100%; max-width: 400px; height: fit-content; border-top: 5px solid #003b8e; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.95rem; font-weight: 700; color: #333; margin-bottom: 8px; }
+        
+        input[type="text"], input[type="file"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 1rem; }
+        
+        /* Adjustment Sliders */
+        .sliders-group { background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .sliders-group label { color: #666; font-weight: 600; font-size: 0.85rem; }
+        input[type="range"] { width: 100%; margin: 5px 0 15px 0; cursor: pointer;}
+        
+        .btn-download { width: 100%; padding: 18px; background: #10b981; color: white; border: none; border-radius: 10px; font-size: 1.2rem; font-weight: 800; cursor: pointer; transition: 0.3s; box-shadow: 0 6px 12px rgba(16, 185, 129, 0.2); }
+        .btn-download:hover { background: #059669; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25); }
+        
+        /* Canvas Visual Scaling */
+        .canvas-display { width: 100%; max-width: 450px; border-radius: 15px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.18); border: 10px solid white; box-sizing: border-box; }
+        canvas { width: 100%; height: auto; display: block; background: #fff; }
+    </style>
+</head>
+<body>
+
+    <h2><i class="fas fa-certificate" style="color: #f59e0b;"></i> SSLC 2026 Full A+ Poster</h2>
+
+    <div class="main-generator-box">
+        <!-- 1. CONTROLS (Input Panel) -->
+        <div class="controls-panel">
+            <div class="form-group">
+                <label>1. Student's Full Name</label>
+                <input type="text" id="studentName" placeholder="e.g. Noushin Rahman VP" onkeyup="drawPosterOnCanvas()">
+            </div>
+            
+            <div class="form-group">
+                <label>2. Upload Student's Portrait</label>
+                <input type="file" id="studentPhoto" accept="image/*" onchange="loadStudentPhoto(event)">
+            </div>
+
+            <div class="sliders-group">
+                <label><i class="fas fa-search-plus"></i> Adjust Photo Size (Zoom)</label>
+                <input type="range" id="zoomFactor" min="0.5" max="3" step="0.05" value="1" oninput="drawPosterOnCanvas()">
+                
+                <label><i class="fas fa-arrows-alt-h"></i> Adjust Horizontal Position</label>
+                <input type="range" id="posXOffset" min="-700" max="700" value="0" oninput="drawPosterOnCanvas()">
+                
+                <label><i class="fas fa-arrows-alt-v"></i> Adjust Vertical Position</label>
+                <input type="range" id="posYOffset" min="-700" max="700" value="0" oninput="drawPosterOnCanvas()">
+            </div>
+            
+            <button class="btn-download" onclick="triggerDownloadPoster()"><i class="fas fa-cloud-download-alt"></i> Download Final PNG</button>
+        </div>
+
+        <!-- 2. CANVAS (Preview Panel) -->
+        <div class="canvas-display">
+            <!-- Fixed vertical dimension 1080x1920 (9:16 ratio) based on image_3.png perfect layout -->
+            <canvas id="posterCanvas" width="1080" height="1920"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('posterCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 1. Core image assets
+        const templateImgAsset = new Image();
+        const studentImgAsset = new Image();
+        
+        // Use the exact filename from Step 2
+        templateImgAsset.src = 'sslc-template.png'; 
+        
+        // Start the process as soon as the base template loads
+        templateImgAsset.onload = drawPosterOnCanvas;
+
+        function loadStudentPhoto(event) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                studentImgAsset.src = e.target.result;
+                // Redraw once the student photo is loaded
+                studentImgAsset.onload = drawPosterOnCanvas;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function drawPosterOnCanvas() {
+            // A. Clear the canvas for a fresh drawing
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // B. Draw white background base
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // C. Draw STUDENT PHOTO in the background layer
+            if (studentImgAsset.src) {
+                // Fetch the values from the adjustment sliders
+                const currentZoom = parseFloat(document.getElementById('zoomFactor').value);
+                const currentXOffset = parseInt(document.getElementById('posXOffset').value);
+                const currentYOffset = parseInt(document.getElementById('posYOffset').value);
+
+                // Calculate the adjusted dimensions for the photo
+                const finalImgWidth = studentImgAsset.width * currentZoom;
+                const finalImgHeight = studentImgAsset.height * currentZoom;
+                
+                // Position the image so its center is generally behind the transparent hole area
+                // Based on image_3.png, the hole is roughly in the center-top.
+                const startXPos = (canvas.width - finalImgWidth) / 2 + currentXOffset;
+                const startYPos = (canvas.height - finalImgHeight) / 2 - 100 + currentYOffset; // -100 offset starts it higher
+
+                ctx.drawImage(studentImgAsset, startXPos, startYPos, finalImgWidth, finalImgHeight);
+            }
+
+            // D. Draw the Transparent Template Image (on TOP layer)
+            // It will layer over the student photo, showing only their face through the cutout hole.
+            ctx.drawImage(templateImgAsset, 0, 0, canvas.width, canvas.height);
+
+            // E. Add the Student's Name in the white space below the photo/badge
+            const studentNameValue = document.getElementById('studentName').value;
+            if (studentNameValue) {
+                // "bold good font in a sized which filles the gap": Poppins Bold at 85px looks great
+                ctx.font = "900 85px 'Poppins', sans-serif";
+                ctx.fillStyle = "#003b8e"; // Bold Dark Blue to match the theme
+                ctx.textAlign = "center";
+                
+                // Positioned roughly in the middle of the large white area at bottom
+                // Y Position set to 1530 to perfectly match the white space in image_3.png
+                ctx.fillText(studentNameValue.toUpperCase(), canvas.width / 2, 1530); 
+            }
+        }
+
+        function triggerDownloadPoster() {
+            // Get student name for filename, default to "Student" if blank
+            const nameToUse = document.getElementById('studentName').value || 'Student';
+            
+            // Clean name for filename (remove spaces, etc.)
+            const sanitizedName = nameToUse.replace(/\s+/g, '_');
+
+            const link = document.createElement('a');
+            link.download = sanitizedName + '_SSLC_2026_Full_A_Plus.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
