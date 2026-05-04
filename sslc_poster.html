@@ -6,50 +6,122 @@
     <title>Academy | SSLC A+ Poster Generator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
         
-        body { font-family: 'Poppins', sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 15px; box-sizing: border-box;}
+        :root {
+            --primary-blue: #003b8e;
+            --light-blue: #0056d6;
+            --dark-blue: #001f4d;
+            --white: #ffffff;
+            --bg-light: #f0f4f8;
+            --text-dark: #1a2a3a;
+        }
         
-        h2 { color: #003b8e; text-align: center; margin: 5px 0 15px 0; font-size: 1.3rem; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg-light); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 0; 
+            padding: 100px 15px 30px 15px; /* Added top padding for the fixed navbar */
+            box-sizing: border-box;
+            color: var(--text-dark);
+        }
+
+        /* --- THEMED NAVBAR --- */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 75px;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .nav-logo { 
+            display: flex; align-items: center;
+            font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 800; color: var(--primary-blue); 
+            text-decoration: none; letter-spacing: 1px; text-transform: uppercase;
+            transition: transform 0.2s ease;
+        }
+        .nav-logo:hover { transform: scale(1.02); }
+        
+        .logo-img { height: 35px; width: auto; margin-right: 12px; border-radius: 4px; }
+        
+        .nav-back-btn {
+            background: var(--bg-light); color: var(--primary-blue);
+            padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;
+            text-decoration: none; transition: all 0.3s ease; border: 1px solid #e1e8f0;
+        }
+        .nav-back-btn:hover { background: var(--primary-blue); color: var(--white); }
+
+        h2 { color: var(--primary-blue); text-align: center; margin: 10px 0 25px 0; font-size: 1.5rem; font-weight: 800; text-transform: uppercase; }
         
         /* Mobile-First Layout */
-        .main-generator-box { display: flex; flex-direction: column; gap: 15px; align-items: center; max-width: 1200px; width: 100%; }
+        .main-generator-box { display: flex; flex-direction: column; gap: 20px; align-items: center; max-width: 1200px; width: 100%; }
         
-        /* STICKY PREVIEW */
-        .canvas-display { width: 100%; position: sticky; top: 10px; z-index: 100; display: flex; justify-content: center; }
+        /* STICKY PREVIEW (Adjusted for Navbar) */
+        .canvas-display { width: 100%; position: sticky; top: 90px; z-index: 100; display: flex; justify-content: center; }
         
-        canvas { max-height: 45vh; width: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 59, 142, 0.2); border: 4px solid white; background: white; }
+        canvas { max-height: 42vh; width: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(0, 59, 142, 0.15); border: 5px solid white; background: white; }
 
-        .controls-panel { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); width: 100%; max-width: 400px; box-sizing: border-box; border-top: 5px solid #003b8e; margin-bottom: 40px; }
+        /* --- THEMED CONTROLS PANEL --- */
+        .controls-panel { 
+            background: white; padding: 30px; border-radius: 20px; 
+            box-shadow: 0 15px 40px rgba(0, 45, 114, 0.08); width: 100%; max-width: 400px; 
+            box-sizing: border-box; border-top: 6px solid var(--primary-blue); margin-bottom: 40px; 
+        }
         
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 0.95rem; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .form-group { margin-bottom: 22px; }
+        label { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
         
-        input[type="text"], input[type="file"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 1rem; }
+        /* Themed Inputs */
+        input[type="text"], input[type="file"] { 
+            width: 100%; padding: 14px 18px; border: 2px solid #e1e8f0; border-radius: 12px; 
+            box-sizing: border-box; font-family: inherit; font-size: 1rem;
+            background: #f8fafc; transition: 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+        input[type="text"]:focus { outline: none; border-color: var(--light-blue); background: var(--white); box-shadow: 0 8px 15px rgba(0,86,214,0.1); transform: translateY(-2px); }
         
         /* Adjustment Sliders */
-        .sliders-group { background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .sliders-group label { color: #666; font-weight: 600; font-size: 0.85rem; }
+        .sliders-group { background: #f8fafc; padding: 18px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #e1e8f0; }
+        .sliders-group label { color: #555; font-weight: 600; font-size: 0.85rem; }
         
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; outline: none; margin: 8px 0 20px 0; cursor: pointer;}
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; background: #003b8e; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s; }
-        input[type="range"]::-moz-range-thumb { width: 28px; height: 28px; background: #003b8e; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 8px; background: #cbd5e1; border-radius: 5px; outline: none; margin: 10px 0 22px 0; cursor: pointer;}
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; background: var(--primary-blue); border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.25); transition: 0.2s; }
+        input[type="range"]::-moz-range-thumb { width: 28px; height: 28px; background: var(--primary-blue); border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.25); }
         
-        .btn-download { width: 100%; padding: 18px; background: #10b981; color: white; border: none; border-radius: 10px; font-size: 1.2rem; font-weight: 800; cursor: pointer; transition: 0.3s; box-shadow: 0 6px 12px rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; gap: 10px;}
-        .btn-download:hover { background: #059669; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25); }
+        /* Themed Download Button */
+        .btn-download { 
+            background: linear-gradient(135deg, #10b981, #059669); color: var(--white); 
+            width: 100%; padding: 18px; border: none; border-radius: 50px; font-size: 1.15rem; font-weight: 800; 
+            cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3), 0 6px 0 #047857;
+            display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; top: 0;
+        }
+        .btn-download:hover { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-3px); box-shadow: 0 15px 25px rgba(16, 185, 129, 0.4), 0 8px 0 #047857; }
+        .btn-download:active { top: 6px; box-shadow: 0 0 0 transparent; transform: translateY(0); }
 
         /* Tablet/Desktop */
         @media (min-width: 768px) {
-            h2 { font-size: 2rem; margin-bottom: 25px;}
-            .main-generator-box { flex-direction: row; align-items: flex-start; justify-content: center; }
-            .canvas-display { position: relative; top: 0; max-width: 400px;}
+            h2 { font-size: 2.2rem; margin-bottom: 35px;}
+            .main-generator-box { flex-direction: row; align-items: flex-start; justify-content: center; gap: 40px; }
+            .canvas-display { position: relative; top: 0; max-width: 450px;}
             canvas { max-height: 80vh; }
         }
     </style>
 </head>
 <body>
 
-    <h2><i class="fas fa-certificate" style="color: #f59e0b;"></i> SSLC 2026 Full A+ Poster</h2>
+    <!-- THEMED NAVBAR -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+            ACADEMY MADAVOOR
+        </a>
+        <a href="index.html" class="nav-back-btn"><i class="fas fa-home"></i> Home</a>
+    </nav>
+
+    <h2><i class="fas fa-certificate" style="color: #f59e0b;"></i> SSLC Poster Maker</h2>
 
     <div class="main-generator-box">
         <!-- 1. CANVAS PREVIEW -->
@@ -61,7 +133,7 @@
         <div class="controls-panel">
             <div class="form-group">
                 <label>1. Student's Name</label>
-                <input type="text" id="studentName" placeholder="Name" onkeyup="drawPosterOnCanvas()">
+                <input type="text" id="studentName" placeholder="Enter full name..." onkeyup="drawPosterOnCanvas()">
             </div>
             
             <div class="form-group">
@@ -71,7 +143,6 @@
 
             <div class="sliders-group">
                 <label><i class="fas fa-search-plus"></i> Size (Zoom)</label>
-                <!-- FIXED: Min changed to 0.1 for massive zoom out, default value is 0.5 -->
                 <input type="range" id="zoomFactor" min="0.1" max="3" step="0.02" value="0.5" oninput="drawPosterOnCanvas()">
                 
                 <label><i class="fas fa-arrows-alt-h"></i> Horizontal Position</label>
@@ -143,7 +214,6 @@
                 canvas.toBlob(function(blob) {
                     const file = new File([blob], fileName, { type: "image/png" });
                     if (navigator.canShare({ files: [file] })) {
-                        // FIXED: Removed the "title" property so WhatsApp doesn't add text
                         navigator.share({
                             files: [file]
                         }).catch((error) => console.log('User closed share menu', error));
