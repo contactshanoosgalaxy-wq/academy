@@ -83,11 +83,13 @@
         
         canvas { max-height: 42vh; width: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(0, 59, 142, 0.15); border: 5px solid white; background: white; }
 
-        /* --- THEMED CONTROLS PANEL --- */
+       /* --- THEMED CONTROLS PANEL --- */
         .controls-panel { 
             background: white; padding: 30px; border-radius: 20px; 
             box-shadow: 0 15px 40px rgba(0, 45, 114, 0.08); width: 100%; max-width: 400px; 
             box-sizing: border-box; border-top: 6px solid var(--primary-blue); margin-bottom: 40px; 
+            position: relative; /* Gives the panel a position so z-index works */
+            z-index: 200;       /* Puts it on a higher layer than the canvas (100) */
         }
         
         .form-group { margin-bottom: 22px; }
