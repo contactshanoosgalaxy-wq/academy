@@ -110,10 +110,19 @@
 </head>
 <body>
     <div id="app-splash" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#003b8e; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.5s ease;">
-    <div style="width: 80px; height: 80px; border: 5px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite;"></div>
-    <h2 style="color:white; font-family:sans-serif; margin-top:20px; letter-spacing:2px;">ACADEMY</h2>
-    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-</div>
+        
+        <!-- Logo & Spinner Container -->
+        <div style="position: relative; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+            <!-- The Spinning Ring -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 4px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #f59e0b; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; box-sizing: border-box;"></div>
+            
+            <!-- The Logo -->
+            <img src="logo.png" alt="Academy Logo" style="width: 55px; height: auto; border-radius: 8px; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+        </div>
+
+        <h2 style="color:white; font-family:sans-serif; margin-top:25px; letter-spacing:2px; font-weight: 800;">ACADEMY</h2>
+        <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+    </div>
 
 <script>
     // Hide splash screen when the page and Firebase data are ready
