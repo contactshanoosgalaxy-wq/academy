@@ -1,274 +1,563 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Academy | SSLC A+ Poster Generator</title>
+
+    <!-- 1. Basic SEO for the Poster Tool -->
+
     <meta name="description" content="Create your custom SSLC 2026 Full A+ celebration poster instantly. Celebrate your massive achievement with Academy Madavoor!">
+
     <meta name="keywords" content="SSLC A+ poster maker, Kerala SSLC result poster, Academy Madavoor, SSLC celebration template 2026">
+
     <meta name="author" content="Academy Madavoor">
 
+
+
+    <!-- 2. Open Graph Tags for WhatsApp & Facebook Previews -->
+
     <meta property="og:type" content="website">
+
     <meta property="og:url" content="https://academymadavoor.com/sslc_poster.html">
+
     <meta property="og:title" content="SSLC 2026 A+ Poster Maker | Academy Madavoor">
+
     <meta property="og:description" content="Create your custom SSLC 2026 Full A+ celebration poster instantly. Celebrate your massive achievement!">
+
     <meta property="og:image" content="https://academymadavoor.com/share-image2.jpg">
 
+
+
+    <!-- 3. Twitter Card Tags -->
+
     <meta name="twitter:card" content="summary_large_image">
+
     <meta name="twitter:url" content="https://academymadavoor.com/sslc_poster.html">
+
     <meta name="twitter:title" content="SSLC 2026 A+ Poster Maker | Academy Madavoor">
+
     <meta name="twitter:description" content="Create your custom SSLC 2026 Full A+ celebration poster instantly.">
+
     <meta name="twitter:image" content="https://academymadavoor.com/share-image2.jpg">
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <style>
+
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+
         
+
         :root {
+
             --primary-blue: #003b8e;
+
             --light-blue: #0056d6;
+
             --dark-blue: #001f4d;
+
             --white: #ffffff;
+
             --bg-light: #f0f4f8;
+
             --text-dark: #1a2a3a;
+
         }
+
         
+
         body { 
+
             font-family: 'Poppins', sans-serif; 
+
             background: var(--bg-light); 
+
             display: flex; 
+
             flex-direction: column; 
+
             align-items: center; 
+
             margin: 0; 
+
             padding: 100px 15px 30px 15px; /* Added top padding for the fixed navbar */
+
             box-sizing: border-box;
+
             color: var(--text-dark);
+
         }
+
+
 
         /* --- THEMED NAVBAR --- */
+
         .navbar {
+
             position: fixed; top: 0; left: 0; width: 100%; height: 75px;
+
             background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+
             display: flex; justify-content: space-between; align-items: center;
+
             padding: 0 5%; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); z-index: 1000;
+
             box-sizing: border-box;
+
         }
+
+
 
         .nav-logo { 
+
             display: flex; align-items: center;
+
             font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 800; color: var(--primary-blue); 
+
             text-decoration: none; letter-spacing: 1px; text-transform: uppercase;
+
             transition: transform 0.2s ease;
+
         }
+
         .nav-logo:hover { transform: scale(1.02); }
+
         
+
         .logo-img { height: 35px; width: auto; margin-right: 12px; border-radius: 4px; }
+
         
+
         .nav-back-btn {
+
             background: var(--bg-light); color: var(--primary-blue);
+
             padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;
+
             text-decoration: none; transition: all 0.3s ease; border: 1px solid #e1e8f0;
+
         }
+
         .nav-back-btn:hover { background: var(--primary-blue); color: var(--white); }
 
+
+
         h2 { color: var(--primary-blue); text-align: center; margin: 10px 0 25px 0; font-size: 1.5rem; font-weight: 800; text-transform: uppercase; }
+
         
+
         /* Mobile-First Layout */
+
         .main-generator-box { display: flex; flex-direction: column; gap: 20px; align-items: center; max-width: 1200px; width: 100%; }
+
         
+
         /* STICKY PREVIEW (Adjusted for Navbar) */
+
         .canvas-display { width: 100%; position: sticky; top: 90px; z-index: 100; display: flex; justify-content: center; }
+
         
+
         canvas { max-height: 42vh; width: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(0, 59, 142, 0.15); border: 5px solid white; background: white; }
 
-        /* --- THEMED CONTROLS PANEL --- */
+
+
+       /* --- THEMED CONTROLS PANEL --- */
+
         .controls-panel { 
+
             background: white; padding: 30px; border-radius: 20px; 
+
             box-shadow: 0 15px 40px rgba(0, 45, 114, 0.08); width: 100%; max-width: 400px; 
+
             box-sizing: border-box; border-top: 6px solid var(--primary-blue); margin-bottom: 40px; 
+
             position: relative; /* Gives the panel a position so z-index works */
+
             z-index: 200;       /* Puts it on a higher layer than the canvas (100) */
+
         }
+
         
+
         .form-group { margin-bottom: 22px; }
+
         label { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+
         
+
         /* Themed Inputs */
+
         input[type="text"], input[type="file"] { 
+
             width: 100%; padding: 14px 18px; border: 2px solid #e1e8f0; border-radius: 12px; 
+
             box-sizing: border-box; font-family: inherit; font-size: 1rem;
+
             background: #f8fafc; transition: 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+
         }
+
         input[type="text"]:focus { outline: none; border-color: var(--light-blue); background: var(--white); box-shadow: 0 8px 15px rgba(0,86,214,0.1); transform: translateY(-2px); }
+
         
+
         /* Adjustment Sliders */
+
         .sliders-group { background: #f8fafc; padding: 18px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #e1e8f0; }
+
         .sliders-group label { color: #555; font-weight: 600; font-size: 0.85rem; }
+
         
+
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 8px; background: #cbd5e1; border-radius: 5px; outline: none; margin: 10px 0 22px 0; cursor: pointer;}
+
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; background: var(--primary-blue); border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.25); transition: 0.2s; }
+
         input[type="range"]::-moz-range-thumb { width: 28px; height: 28px; background: var(--primary-blue); border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.25); }
+
         
+
         /* Themed Download Button */
+
         .btn-download { 
+
             background: linear-gradient(135deg, #10b981, #059669); color: var(--white); 
+
             width: 100%; padding: 18px; border: none; border-radius: 50px; font-size: 1.15rem; font-weight: 800; 
+
             cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3), 0 6px 0 #047857;
+
             display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; top: 0;
+
         }
+
         .btn-download:hover { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-3px); box-shadow: 0 15px 25px rgba(16, 185, 129, 0.4), 0 8px 0 #047857; }
+
         .btn-download:active { top: 6px; box-shadow: 0 0 0 transparent; transform: translateY(0); }
 
+
+
         /* Tablet/Desktop */
+
         @media (min-width: 768px) {
+
             h2 { font-size: 2.2rem; margin-bottom: 35px;}
+
             .main-generator-box { flex-direction: row; align-items: flex-start; justify-content: center; gap: 40px; }
+
             .canvas-display { position: relative; top: 0; max-width: 450px;}
+
             canvas { max-height: 80vh; }
+
         }
+
     </style>
+
 </head>
+
 <body>
+
     <div id="app-splash" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#003b8e; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.5s ease;">
+
         
+
+        <!-- Logo & Spinner Container -->
+
         <div style="position: relative; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+
+            <!-- The Spinning Ring -->
+
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 4px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #f59e0b; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; box-sizing: border-box;"></div>
+
             
+
+            <!-- The Logo -->
+
             <img src="logo.png" alt="Academy Logo" style="width: 55px; height: auto; border-radius: 8px; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+
         </div>
 
-        <h2 style="color:white; font-family:sans-serif; margin-top:25px; letter-spacing:2px; font-weight: 800;">ACADEMY</h2>
+
+
+       <h2 style="color:white; font-family:sans-serif; margin-top:25px; letter-spacing:2px; font-weight: 800;">ACADEMY</h2>
+
         <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
     </div>
 
+
+
+    <!-- THIS IS THE FIX: The script to hide the loading screen -->
+
     <script>
+
         window.addEventListener('load', function() {
+
             setTimeout(() => {
+
                 const splash = document.getElementById('app-splash');
+
                 splash.style.opacity = '0';
+
                 setTimeout(() => splash.style.display = 'none', 500);
+
             }, 1500); 
+
         });
+
     </script>
 
+
+
+    <!-- THEMED NAVBAR -->
+
     <nav class="navbar">
+
         <a href="index.html" class="nav-logo">
+
             <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+
             ACADEMY MADAVOOR
+
         </a>
+
         <a href="index.html" class="nav-back-btn"><i class="fas fa-home"></i> Home</a>
+
     </nav>
+
+
 
     <h2><i class="fas fa-certificate" style="color: #f59e0b;"></i> SSLC Poster Maker</h2>
 
+
+
     <div class="main-generator-box">
+
+        <!-- 1. CANVAS PREVIEW -->
+
         <div class="canvas-display">
+
             <canvas id="posterCanvas" width="1080" height="1920"></canvas>
+
         </div>
+
+
+
+        <!-- 2. CONTROLS -->
 
         <div class="controls-panel">
+
             <div class="form-group">
+
                 <label>1. Student's Name</label>
+
                 <input type="text" id="studentName" placeholder="Enter full name..." onkeyup="drawPosterOnCanvas()">
+
             </div>
+
             
+
             <div class="form-group">
+
                 <label>2. Upload Portrait</label>
+
                 <input type="file" id="studentPhoto" accept="image/*" onchange="loadStudentPhoto(event)">
+
             </div>
+
+
 
             <div class="sliders-group">
+
                 <label><i class="fas fa-search-plus"></i> Size (Zoom)</label>
+
                 <input type="range" id="zoomFactor" min="0.1" max="3" step="0.02" value="0.5" oninput="drawPosterOnCanvas()">
+
                 
+
                 <label><i class="fas fa-arrows-alt-h"></i> Horizontal Position</label>
+
                 <input type="range" id="posXOffset" min="-1200" max="1200" value="0" oninput="drawPosterOnCanvas()">
+
                 
+
                 <label><i class="fas fa-arrows-alt-v"></i> Vertical Position</label>
+
                 <input type="range" id="posYOffset" min="-1200" max="1200" value="0" oninput="drawPosterOnCanvas()">
+
             </div>
+
             
+
             <button class="btn-download" onclick="triggerDownloadPoster()"><i class="fas fa-cloud-download-alt"></i> Download PNG</button>
+
         </div>
+
     </div>
 
+
+
     <script>
+
         const canvas = document.getElementById('posterCanvas');
+
         const ctx = canvas.getContext('2d');
+
         
+
         const templateImgAsset = new Image();
+
         const studentImgAsset = new Image();
+
         
-        templateImgAsset.src = 'academysslcposter.png'; 
+
+        templateImgAsset.src = 'sslc-template.png'; 
+
         templateImgAsset.onload = drawPosterOnCanvas;
 
+
+
         function loadStudentPhoto(event) {
+
             const reader = new FileReader();
+
             reader.onload = function(e) {
+
                 studentImgAsset.src = e.target.result;
+
                 studentImgAsset.onload = drawPosterOnCanvas;
+
             }
+
             reader.readAsDataURL(event.target.files[0]);
+
         }
 
+
+
         function drawPosterOnCanvas() {
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             ctx.fillStyle = "#ffffff";
+
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+
+
             if (studentImgAsset.src) {
+
                 const currentZoom = parseFloat(document.getElementById('zoomFactor').value);
+
                 const currentXOffset = parseInt(document.getElementById('posXOffset').value);
+
                 const currentYOffset = parseInt(document.getElementById('posYOffset').value);
 
+
+
                 const finalImgWidth = studentImgAsset.width * currentZoom;
+
                 const finalImgHeight = studentImgAsset.height * currentZoom;
+
                 
+
                 const startXPos = (canvas.width - finalImgWidth) / 2 + currentXOffset;
-                const startYPos = (canvas.height - finalImgHeight) / 2 + currentYOffset; // Removed the -100 offset for new centered template
+
+                const startYPos = (canvas.height - finalImgHeight) / 2 - 100 + currentYOffset; 
+
+
 
                 ctx.drawImage(studentImgAsset, startXPos, startYPos, finalImgWidth, finalImgHeight);
+
             }
+
+
 
             ctx.drawImage(templateImgAsset, 0, 0, canvas.width, canvas.height);
 
+
+
             const studentNameValue = document.getElementById('studentName').value;
+
             if (studentNameValue) {
-                // Adjusting font size to sit cleanly on the new line provided in your template.
-                ctx.font = "900 75px 'Poppins', sans-serif"; 
-                ctx.fillStyle = "#ffffff"; // White text is now standard for your new design
+
+                ctx.font = "900 85px 'Poppins', sans-serif";
+
+                ctx.fillStyle = "#003b8e";
+
                 ctx.textAlign = "center";
-                // Vertical position moved from 1400 to 1350 for precise placement on the new line.
-                ctx.fillText(studentNameValue.toUpperCase(), canvas.width / 2, 1350); 
+
+                ctx.fillText(studentNameValue.toUpperCase(), canvas.width / 2, 1400); 
+
             }
+
         }
+
+
 
         function triggerDownloadPoster() {
+
             const nameToUse = document.getElementById('studentName').value || 'Student';
+
             const sanitizedName = nameToUse.replace(/\s+/g, '_');
+
             const fileName = sanitizedName + '_SSLC_2026.png';
 
+
+
             if (navigator.canShare && navigator.share) {
+
                 canvas.toBlob(function(blob) {
+
                     const file = new File([blob], fileName, { type: "image/png" });
+
                     if (navigator.canShare({ files: [file] })) {
+
                         navigator.share({
+
                             files: [file]
+
                         }).catch((error) => console.log('User closed share menu', error));
+
                     } else {
+
                         forceStandardDownload(fileName); 
+
                     }
+
                 });
+
             } else {
+
                 forceStandardDownload(fileName); 
+
             }
+
         }
 
+
+
         function forceStandardDownload(fileName) {
+
             const link = document.createElement('a');
+
             link.download = fileName;
+
             link.href = canvas.toDataURL('image/png');
+
             link.click();
+
         }
+
     </script>
+
 </body>
+
 </html>
