@@ -4,19 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Academy | SSLC A+ Poster Generator</title>
-    <!-- 1. Basic SEO for the Poster Tool -->
     <meta name="description" content="Create your custom SSLC 2026 Full A+ celebration poster instantly. Celebrate your massive achievement with Academy Madavoor!">
     <meta name="keywords" content="SSLC A+ poster maker, Kerala SSLC result poster, Academy Madavoor, SSLC celebration template 2026">
     <meta name="author" content="Academy Madavoor">
 
-    <!-- 2. Open Graph Tags for WhatsApp & Facebook Previews -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://academymadavoor.com/sslc_poster.html">
     <meta property="og:title" content="SSLC 2026 A+ Poster Maker | Academy Madavoor">
     <meta property="og:description" content="Create your custom SSLC 2026 Full A+ celebration poster instantly. Celebrate your massive achievement!">
     <meta property="og:image" content="https://academymadavoor.com/share-image2.jpg">
 
-    <!-- 3. Twitter Card Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://academymadavoor.com/sslc_poster.html">
     <meta name="twitter:title" content="SSLC 2026 A+ Poster Maker | Academy Madavoor">
@@ -83,7 +80,7 @@
         
         canvas { max-height: 42vh; width: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(0, 59, 142, 0.15); border: 5px solid white; background: white; }
 
-       /* --- THEMED CONTROLS PANEL --- */
+        /* --- THEMED CONTROLS PANEL --- */
         .controls-panel { 
             background: white; padding: 30px; border-radius: 20px; 
             box-shadow: 0 15px 40px rgba(0, 45, 114, 0.08); width: 100%; max-width: 400px; 
@@ -133,20 +130,16 @@
 <body>
     <div id="app-splash" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#003b8e; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.5s ease;">
         
-        <!-- Logo & Spinner Container -->
         <div style="position: relative; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
-            <!-- The Spinning Ring -->
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 4px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #f59e0b; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; box-sizing: border-box;"></div>
             
-            <!-- The Logo -->
             <img src="logo.png" alt="Academy Logo" style="width: 55px; height: auto; border-radius: 8px; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
         </div>
 
-       <h2 style="color:white; font-family:sans-serif; margin-top:25px; letter-spacing:2px; font-weight: 800;">ACADEMY</h2>
+        <h2 style="color:white; font-family:sans-serif; margin-top:25px; letter-spacing:2px; font-weight: 800;">ACADEMY</h2>
         <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
     </div>
 
-    <!-- THIS IS THE FIX: The script to hide the loading screen -->
     <script>
         window.addEventListener('load', function() {
             setTimeout(() => {
@@ -157,7 +150,6 @@
         });
     </script>
 
-    <!-- THEMED NAVBAR -->
     <nav class="navbar">
         <a href="index.html" class="nav-logo">
             <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
@@ -169,12 +161,10 @@
     <h2><i class="fas fa-certificate" style="color: #f59e0b;"></i> SSLC Poster Maker</h2>
 
     <div class="main-generator-box">
-        <!-- 1. CANVAS PREVIEW -->
         <div class="canvas-display">
             <canvas id="posterCanvas" width="1080" height="1920"></canvas>
         </div>
 
-        <!-- 2. CONTROLS -->
         <div class="controls-panel">
             <div class="form-group">
                 <label>1. Student's Name</label>
@@ -208,7 +198,7 @@
         const templateImgAsset = new Image();
         const studentImgAsset = new Image();
         
-        templateImgAsset.src = 'sslc-template.png'; 
+        templateImgAsset.src = 'academysslcposter.png'; 
         templateImgAsset.onload = drawPosterOnCanvas;
 
         function loadStudentPhoto(event) {
@@ -234,7 +224,7 @@
                 const finalImgHeight = studentImgAsset.height * currentZoom;
                 
                 const startXPos = (canvas.width - finalImgWidth) / 2 + currentXOffset;
-                const startYPos = (canvas.height - finalImgHeight) / 2 - 100 + currentYOffset; 
+                const startYPos = (canvas.height - finalImgHeight) / 2 + currentYOffset; // Removed the -100 offset for new centered template
 
                 ctx.drawImage(studentImgAsset, startXPos, startYPos, finalImgWidth, finalImgHeight);
             }
@@ -243,10 +233,12 @@
 
             const studentNameValue = document.getElementById('studentName').value;
             if (studentNameValue) {
-                ctx.font = "900 85px 'Poppins', sans-serif";
-                ctx.fillStyle = "#003b8e";
+                // Adjusting font size to sit cleanly on the new line provided in your template.
+                ctx.font = "900 75px 'Poppins', sans-serif"; 
+                ctx.fillStyle = "#ffffff"; // White text is now standard for your new design
                 ctx.textAlign = "center";
-                ctx.fillText(studentNameValue.toUpperCase(), canvas.width / 2, 1400); 
+                // Vertical position moved from 1400 to 1350 for precise placement on the new line.
+                ctx.fillText(studentNameValue.toUpperCase(), canvas.width / 2, 1350); 
             }
         }
 
